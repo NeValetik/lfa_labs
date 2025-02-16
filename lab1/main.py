@@ -10,17 +10,18 @@ grammar = Grammar(
   },
   S = "S",
 )
-print("Generate already valid strings:")
-[print(grammar.generate_valid_string()) for _ in range(5)]
 
-print("\nTesting random strings:")
-test_strings = ["acab", "bac", "ca", "cb", "aaaa", "aaaaaab"]
-fa = grammar.to_finite_automata()
-for string in test_strings:
-    print(f"{string}:{fa.string_validation(string)}")
+print("List of randomly generated valid strings:") 
+print(*[grammar.generateValidString()  for _ in range(5)]) 
+
+print("Random String Test:")
+testStrings = ["cbb", "bac", "ca", "cb", "aaaa", "aaaaaab"]
+fa = grammar.toFiniteAutomata()
+for string in testStrings:
+  print(f"{string}:{fa.stringValidation(string)}")
+
 while True:
-    user_input = input("Enter any other random string (or empty to end): ")
-    if user_input == "":
-        print("Exiting")
-        break
-    print(f"{user_input}: {fa.string_validation(user_input)}\n")
+  inp = input("Enter any other random string (or empty to end): ")
+  if inp == "":
+    break
+  print(f"{inp}: {fa.stringValidation(inp)}\n")

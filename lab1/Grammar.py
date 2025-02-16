@@ -8,36 +8,45 @@ class Grammar:
     self.P = args.get("P")
     self.S = args.get("S")
 
-  def generate_valid_string(self):
+  def generateValidString(self):
     current = self.S        
     while any(symbol in self.Vn for symbol in current):
-      new_string = ""
+      string = ""
       for symbol in current:
         if symbol in self.Vn:
-          new_string += random.choice(self.P[symbol])
+          string += random.choice(self.P[symbol])
         else:
-          new_string += symbol
-      current = new_string
+          string += symbol
+      current = string
     return current
 
-  def to_finite_automata(self):
-    states = set(self.Vn) | {""}
+  def toFiniteAutomata(self):
+    states = set(self.Vn)
     alphabet = set(self.Vt)
-    transitions = {}
-    start_state = self.S
-    final_states = {""}
+    startState = self.S
+    finalStates = [""]
+    transitionFunction = {}
 
-    for non_terminal, rules in self.P.items():
-      for rule in rules:
-        if len(rule) == 1 and rule in self.Vt:
-          if (non_terminal, rule) not in transitions:
-            transitions[(non_terminal, rule)] = set()
-          transitions[(non_terminal, rule)].add("")
-        elif len(rule) >= 1:
-          first_symbol = rule[0] 
-          next_state = rule[1:] if len(rule) > 1 else ""
-          
-          if (non_terminal, first_symbol) not in transitions:
-            transitions[(non_terminal, first_symbol)] = set()
-          transitions[(non_terminal, first_symbol)].add(next_state)
-    return FiniteAutomata(states, alphabet, transitions, start_state, final_states)      
+    for nonTerm, res in self.P.items():
+      for sequence in res:
+        statePos = next((i for i, c in enumerate(sequence) if c in states), -1) # should be also updated to more non-terminals
+
+        key = (
+          nonTerm, 
+          sequence[:statePos] if statePos != -1 else sequence
+        )
+
+        value = sequence[statePos] if statePos != -1 else ""
+
+        if key not in transitionFunction:
+          transitionFunction[key] = [value]
+        elif value not in transitionFunction[key]:  
+          transitionFunction[key].append(value)
+
+    return FiniteAutomata( 
+      states = states, 
+      alphabet = alphabet, 
+      startState = startState, 
+      finalStates = finalStates, 
+      transitions = transitionFunction
+    )    
