@@ -49,6 +49,7 @@ class FiniteAutomata:
 ```
 
 The output:
+
 ![alt text](image.png)
 
 ## Conclusions
