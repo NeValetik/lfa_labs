@@ -25,10 +25,11 @@
   }  
 ```
 ## Theory
-# Finite Automata
+
+### Finite Automata
 Finite automata are abstract machines used to recognize patterns in input sequences, forming the basis for understanding regular languages in computer science. They consist of states, transitions, and input symbols, processing each symbol step-by-step. If the machine ends in an accepting state after processing the input, it is accepted; otherwise, it is rejected. Finite automata come in deterministic (DFA) and non-deterministic (NFA), both of which can recognize the same set of regular languages. They are widely used in text processing, compilers, and network protocols.
 
-# Finite Languages
+### Finite Languages
 
 A finite language is a subset of strings over an alphabet that contains a limited number of elements. Unlike infinite languages (e.g., those defined by regular expressions or grammars that allow recursion), finite languages are strictly bounded in the number of words they can generate. These languages can always be recognized by a finite automaton since their state space is limited.
 
