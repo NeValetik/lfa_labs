@@ -9,23 +9,34 @@
   2. Implement the Finite Automaton with custom set Grammar
   3. Setup the repo for the future use 
 ```
-  My variant was 31:
+  My variant was 32:
   {
-    VN = {S, D, R},
-    VT = {a, b, c},
-    P = {
+    Variant 32:
+    VN={S, D, R},
+    VT={a, b, c},
+    P={ 
         S → aS     
-        S → bS    
         S → cD   
-        D → bD    
-        D → cR  
-        D → a
+        D → bR    
+        R → aR  
         R → b
+        R → cS
     }
   }  
 ```
 ## Theory
+# Finite Automata
 Finite automata are abstract machines used to recognize patterns in input sequences, forming the basis for understanding regular languages in computer science. They consist of states, transitions, and input symbols, processing each symbol step-by-step. If the machine ends in an accepting state after processing the input, it is accepted; otherwise, it is rejected. Finite automata come in deterministic (DFA) and non-deterministic (NFA), both of which can recognize the same set of regular languages. They are widely used in text processing, compilers, and network protocols.
+
+# Finite Languages
+
+A finite language is a subset of strings over an alphabet that contains a limited number of elements. Unlike infinite languages (e.g., those defined by regular expressions or grammars that allow recursion), finite languages are strictly bounded in the number of words they can generate. These languages can always be recognized by a finite automaton since their state space is limited.
+
+For example, a finite language over the alphabet {a, b, c} might be:L = { "a", "ab", "abc", "bca" }
+
+Since the language contains a fixed number of elements, it can be easily modeled using a simple finite automaton with a defined set of accepting states corresponding to each word in the language.
+
+Finite languages are useful in applications like keyword recognition, predefined command sets, and pattern matching, where the number of valid strings is strictly known.
 
 ## Implementation description
 I chose the python language to skip all the distracting implementations even though I am really upset
@@ -33,26 +44,18 @@ that python does not have object spreadinig like javascript, I even, at some mom
 
 The implementation itself goes after the given example the only difference between the given "assist" and my implementation is separation of the classes. The grammar class takes the elements to initialize the language grammar. After that the grammar elements are used in Finite automaton creation which than is able to validate the input if it belongs to the given grammar. The last, but least is the main, just initialization and invoke, nothing more nothing less.
 
-This is the structure of the Program    
+This is the structure of the Program:
+
 ```python
 class Grammar:
   ...
   def toFiniteAutomata():
-    states = set(self.Vn) 
-    alphabet = set(self.Vt)
-    startState = self.S
-    finalStates = [""]
-    transitionFunction = {}
-    # we initialize all the variables that are required by finiteAutomaton
-
     for nonTerm, res in self.P.items():
-      # here we go through all the rules/conditions for non terminals and values they can transform into
       for sequence in res:
-        # here we loop through all values that the responses could take 
-        # statePos stands finds the state(non terminal symbol) and returns it position 
+      
         statePos = next((i for i, c in enumerate(sequence) if c in states), -1) # should be also updated to more non-terminals
         
-        # the model of the transition function dictionary is {("<non-terminal>", "<terminal>"): ["<non-terminal>"]}
+        
         key = (
           nonTerm, 
           sequence[:statePos] if statePos != -1 else sequence
@@ -64,24 +67,15 @@ class Grammar:
           transitionFunction[key] = [value]
         elif value not in transitionFunction[key]:  
           transitionFunction[key].append(value)
-
-    # creation of automata
-    return FiniteAutomata( 
-      states = states, 
-      alphabet = alphabet, 
-      startState = startState, 
-      finalStates = finalStates, 
-      transitions = transitionFunction
-    )
+  ...
 ```
+In the first loop the cycle goes through all the rules/conditions for non terminals and values they can transform into. Then the cycle loops through all values that the responses could take and are predefined. Then the position of the non-terminal state is found in sequences and returned the position of them and then the key is create as ("<non-terminal>", "<terminal>") and the value is ["<non-terminal>"...].
 
 The next significant part is the finite automaton itself and its validation:
 ```python
 class FiniteAutomata:
   ...
   def stringValidation(self, inp):
-    # the initial state is taken
-    stateTrack = self.startState
     # then we are looping through the given input character by character
     for ch in inp:
       # if the character doesn't match the alfabet we return false
@@ -94,11 +88,10 @@ class FiniteAutomata:
       
       # update the state transition
       stateTrack = self.transitions[(stateTrack, ch)][0] # logic should be added for scalability
-
-    # return if reached the final state
-    return stateTrack in self.finalStates    
+    ...
 # Validates the given input
 ```
+In the finite automata the loop goes through inputed string and then it is verified if the string belongs to the alphabet, after that if the string in pair with the current state is in the transformations dictionary and after that the state is updated until it finishes the final state or breaks a rule.
 
 The output:
 
