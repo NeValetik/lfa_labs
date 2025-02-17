@@ -24,6 +24,9 @@
     }
   }  
 ```
+## Theory
+Finite automata are abstract machines used to recognize patterns in input sequences, forming the basis for understanding regular languages in computer science. They consist of states, transitions, and input symbols, processing each symbol step-by-step. If the machine ends in an accepting state after processing the input, it is accepted; otherwise, it is rejected. Finite automata come in deterministic (DFA) and non-deterministic (NFA), both of which can recognize the same set of regular languages. They are widely used in text processing, compilers, and network protocols.
+
 ## Implementation description
 I chose the python language to skip all the distracting implementations even though I am really upset
 that python does not have object spreadinig like javascript, I even, at some moment, imported a library that implements the js object(dict) spreading, but nevertheless it is what it is.
@@ -33,18 +36,67 @@ The implementation itself goes after the given example the only difference betwe
 This is the structure of the Program    
 ```python
 class Grammar:
-  def __init__(**args):
-# Initializtion
-  def generateValidString():
-# Generates some valid strings for grammar
+  ...
   def toFiniteAutomata():
-# Procesess grammar to make transitions which will be given to finite automaton and returns the instance of it    
-    return FiniteAutomata( )
+    states = set(self.Vn) 
+    alphabet = set(self.Vt)
+    startState = self.S
+    finalStates = [""]
+    transitionFunction = {}
+    # we initialize all the variables that are required by finiteAutomaton
 
+    for nonTerm, res in self.P.items():
+      # here we go through all the rules/conditions for non terminals and values they can transform into
+      for sequence in res:
+        # here we loop through all values that the responses could take 
+        # statePos stands finds the state(non terminal symbol) and returns it position 
+        statePos = next((i for i, c in enumerate(sequence) if c in states), -1) # should be also updated to more non-terminals
+        
+        # the model of the transition function dictionary is {("<non-terminal>", "<terminal>"): ["<non-terminal>"]}
+        key = (
+          nonTerm, 
+          sequence[:statePos] if statePos != -1 else sequence
+        )
+
+        value = sequence[statePos] if statePos != -1 else ""
+
+        if key not in transitionFunction:
+          transitionFunction[key] = [value]
+        elif value not in transitionFunction[key]:  
+          transitionFunction[key].append(value)
+
+    # creation of automata
+    return FiniteAutomata( 
+      states = states, 
+      alphabet = alphabet, 
+      startState = startState, 
+      finalStates = finalStates, 
+      transitions = transitionFunction
+    )
+```
+
+The next significant part is the finite automaton itself and its validation:
+```python
 class FiniteAutomata:
-  def __init__(**args):
-# Initializes the automaton
-  def stringValidation(inp):
+  ...
+  def stringValidation(self, inp):
+    # the initial state is taken
+    stateTrack = self.startState
+    # then we are looping through the given input character by character
+    for ch in inp:
+      # if the character doesn't match the alfabet we return false
+      if ch not in self.alphabet:
+        return False
+      
+      # if the character doesn't exist in the state transformations in the pair with state return false
+      if (stateTrack, ch) not in self.transitions:
+        return False
+      
+      # update the state transition
+      stateTrack = self.transitions[(stateTrack, ch)][0] # logic should be added for scalability
+
+    # return if reached the final state
+    return stateTrack in self.finalStates    
 # Validates the given input
 ```
 
