@@ -10,11 +10,13 @@
 # δ(q2,a) = q2.
 
 import random
-import lab1.FiniteAutomaton as fa
-import lab1.Grammar as gram1
+from lab1.FiniteAutomata import FiniteAutomata as fa
+from lab1.Grammar import Grammar as gram1
 
+class Grammar2(gram1):
+  def __init__(self, **args):
+    super().__init__(**args)
 
-class Grammar(gram1):
   def chomskyTipisation(self):
     isType1 = True 
     isType2 = True  
@@ -56,3 +58,5 @@ class Grammar(gram1):
     return "Type 0: Unrestricted Grammar"
   
 
+  def __str__(self):
+    return str(self.P)

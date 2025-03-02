@@ -1,4 +1,4 @@
-from Grammar import *
+from lab1.Grammar import *
 
 grammar = Grammar(
   Vn = {"S", "D", "R"},

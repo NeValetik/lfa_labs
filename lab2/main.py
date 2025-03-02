@@ -9,7 +9,7 @@
 # δ(q1,a) = q2,
 # δ(q2,a) = q2.
 
-from lab1.FiniteAutomaton import *
+from lab2.FiniteAutomata2 import *
 
 states = { "q0", "q1", "q2" }
 alphabet = { "a", "b", "c" }
@@ -21,7 +21,17 @@ transitions = {
   ( "q2", "a" ): [ "q2" ],
 }
 startState = "q0"
-finalStates = "q2"
+finalStates = [ "q2" ]
+
+fa = FiniteAutomata2(
+  states = states,
+  alphabet = alphabet,
+  transitions = transitions,
+  startState = startState,
+  finalStates = finalStates
+)
+
+print(fa.finiteAutomatonToGrammar())
 
 
 

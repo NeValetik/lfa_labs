@@ -1,4 +1,4 @@
-from FiniteAutomaton import * 
+from lab1.FiniteAutomata import * 
 import random
 class Grammar:
 
