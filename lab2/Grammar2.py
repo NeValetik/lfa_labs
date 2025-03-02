@@ -1,15 +1,3 @@
-# Variant 32
-# Q = {q0,q1,q2},
-# ∑ = {a,b,c},
-# F = {q2},
-# δ(q0,a) = q0,
-# δ(q0,a) = q1,
-# δ(q1,c) = q0,
-# δ(q1,b) = q1,
-# δ(q1,a) = q2,
-# δ(q2,a) = q2.
-
-import random
 from lab1.FiniteAutomata import FiniteAutomata as fa
 from lab1.Grammar import Grammar as gram1
 
