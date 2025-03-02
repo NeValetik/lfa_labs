@@ -15,13 +15,6 @@ import lab1.Grammar as gram1
 
 
 class Grammar(gram1):
-
-  @classmethod
-  def finiteAutomatonToGrammar(cls, automaton):
-    grammar = {}
-    
-    return grammar
-
   def chomskyTipisation(self):
     isType1 = True 
     isType2 = True  

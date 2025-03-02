@@ -1,0 +1,27 @@
+# Variant 32
+# Q = {q0,q1,q2},
+# ∑ = {a,b,c},
+# F = {q2},
+# δ(q0,a) = q0,
+# δ(q0,a) = q1,
+# δ(q1,c) = q0,
+# δ(q1,b) = q1,
+# δ(q1,a) = q2,
+# δ(q2,a) = q2.
+
+from lab1.FiniteAutomaton import *
+
+states = { "q0", "q1", "q2" }
+alphabet = { "a", "b", "c" }
+transitions = {
+  ( "q0", "a" ): [ "q0", "q1" ],
+  ( "q1", "c" ): [ "q0" ],
+  ( "q1", "b" ): [ "q1" ],
+  ( "q1", "a" ): [ "q2" ],
+  ( "q2", "a" ): [ "q2" ],
+}
+startState = "q0"
+finalStates = "q2"
+
+
+

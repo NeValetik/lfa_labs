@@ -1,2 +1,6 @@
 class Converter:
-  pass
+  @staticmethod
+  def finiteAutomatonToGrammar(automaton):
+    grammar = {}
+    
+    return grammar

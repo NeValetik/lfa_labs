@@ -12,16 +12,15 @@
   My variant was 32:
   {
     Variant 32:
-    VN={S, D, R},
-    VT={a, b, c},
-    P={ 
-        S → aS     
-        S → cD   
-        D → bR    
-        R → aR  
-        R → b
-        R → cS
-    }
+      Q = {q0,q1,q2},
+      ∑ = {a,b,c},
+      F = {q2},
+      δ(q0,a) = q0,
+      δ(q0,a) = q1,
+      δ(q1,c) = q0,
+      δ(q1,b) = q1,
+      δ(q1,a) = q2,
+      δ(q2,a) = q2.
   }  
 ```
 ## Theory
