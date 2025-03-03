@@ -16,9 +16,9 @@ class FiniteAutomata2 (FiniteAutomata):
         if key[0] not in P.keys():
           P[key[0]] = [key[1] + value]
         else:
+          if key[0] in self.finalStates:
+            P[key[0]].append(key[1])
           P[key[0]].append(key[1] + value)
-        if key[0] in self.finalStates:
-          P[key[0]].append(key[1])
 
     return Grammar2(
       Vn = Vn,
