@@ -1,5 +1,6 @@
 from lab1.FiniteAutomata import *
 from lab2.Grammar2 import *
+from collections import deque
 
 class FiniteAutomata2 (FiniteAutomata):
   def __init__(self, **args):
@@ -16,9 +17,9 @@ class FiniteAutomata2 (FiniteAutomata):
         if key[0] not in P.keys():
           P[key[0]] = [key[1] + value]
         else:
-          if key[0] in self.finalStates:
-            P[key[0]].append(key[1])
           P[key[0]].append(key[1] + value)
+        if key[0] in self.finalStates:
+          P[key[0]].append(key[1])
 
     return Grammar2(
       Vn = Vn,
@@ -42,51 +43,43 @@ class FiniteAutomata2 (FiniteAutomata):
             return False
     return True
 
-  def NfaToDfa(self):
-    dfaStates = set()
+  def NfaToDfa(self) -> FiniteAutomata:
+    dfaStartState = self.startState
+    dfaFinalStates  = [] 
+
+    dfaStates = {}
     dfaTransitions = {}
-    dfaFinalStates = set()
+
+    currentState = [self.startState]
     
-    # Start with the start state
-    startStateSet = frozenset([self.startState])
-    unmarkedStates = [startStateSet]
-    dfaStates.add(startStateSet)
-    
-    # Process all unmarked state sets
-    while unmarkedStates:
-      currentStateSet = unmarkedStates.pop(0)
-      
-      # Check if this is a final state
-      if any(state in self.finalStates for state in currentStateSet):
-        dfaFinalStates.add(currentStateSet)
-      
-      # For each symbol in the alphabet
-      for symbol in self.alphabet:
-        nextStateSet = frozenset(
-          nextState
-          for state in currentStateSet
-          for nextState in self.transitions.get((state, symbol), set())
-        )
-        
-        if not nextStateSet:
-          continue  # No transition for this symbol
-        
-        # Add the transition
-        dfaTransitions[(currentStateSet, symbol)] = {nextStateSet}
-        
-        # If this is a new state, add it to be processed
-        if nextStateSet not in dfaStates:
-          dfaStates.add(nextStateSet)
-          unmarkedStates.append(nextStateSet)
+    queue = deque([dfaStartState])
+
+    while queue:
+        currentState = queue.popleft()
+        dfaTransitions[currentState] = {}
+
+        for symbol in self.alphabet:
+            newState = set()
+            
+            for nfaState in currentState:
+                if (nfaState, symbol) in self.transitions:
+                    newState.update(self.transitions[(nfaState, symbol)])
+
+            if newState:
+                if newState not in dfaStates:
+                    dfaStates[newState] = newState
+                    queue.append(newState)
+                
+                dfaTransitions[currentState][symbol] = newState
+
+    for dfaState in dfaStates:
+        if any(state in self.finalStates for state in dfaState):
+            dfaFinalStates.add(dfaState)
+
     return FiniteAutomata(
-      dfaStates,
-      self.alphabet,
-      dfaTransitions,
-      startStateSet,
-      dfaFinalStates
+        states=set(dfaStates.keys()),
+        alphabet=self.alphabet,
+        transitions=dfaTransitions,
+        startState=dfaStartState,
+        finalStates=dfaFinalStates
     )
-    
-  # def NfaToDfa(self):
-  #   grammar = {}
-    
-  #   return grammar
