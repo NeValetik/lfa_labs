@@ -74,39 +74,107 @@ F = {q2},
 
 ## Implementation
 ### Chomsky Hierarchy Classification
+The chomskyTypization method classifies a grammar according to the Chomsky hierarchy by checking its production rules. It verifies if the grammar is Type 3 (Regular) by ensuring rules follow strict left- or right-regular forms, Type 2 (Context-Free) by requiring a single non-terminal on the left-hand side, and Type 1 (Context-Sensitive) by ensuring no production shortens the left-hand side (except for an allowed empty production from the start symbol). If none of these conditions hold, it classifies the grammar as Type 0 (Unrestricted). The method iterates through the rules, updating type flags accordingly, and returns the most restrictive classification the grammar satisfies.
+
+```python
+def chomskyTypization(self):
+    isType1 = True 
+    isType2 = True  
+    isType3Left = True 
+    isType3Right = True  
+    
+    hasEmptyProduction = False
+    for lhs, rules in self.P.items():
+      for rule in rules:
+        if rule == "": 
+          if lhs != self.S or hasEmptyProduction:
+            isType1 = False 
+          hasEmptyProduction = True
+    
+    for lhs, rules in self.P.items():
+      if len(lhs) != 1 or lhs not in self.Vn:
+        isType2 = isType3Right = isType3Left = False
+        
+      for rule in rules:
+        if rule == "":
+          isType3Right = isType3Left = False
+          continue
+      
+        if any(c in self.Vn for c in rule[:-1]):
+          isType3Right = False
+
+        if len(rule) > 1 and (rule[0] not in self.Vn or any(c in self.Vn for c in rule[1:])):
+          isType3Left = False
+    
+        if len(rule) < len(lhs) and not (lhs == self.S and rule == ""):
+          isType1 = False
+
+    if isType3Right or isType3Left:
+      return "Type 3: Regular Grammar"
+    if isType2:
+      return "Type 2: Context-Free Grammar"
+    if isType1:
+      return "Type 1: Context-Sensitive Grammar"
+    return "Type 0: Unrestricted Grammar"
+```
 
 
 ### FA To Grammar
-
+The finiteAutomatonToGrammar method converts a finite automaton into an equivalent regular grammar. It initializes the grammar's non-terminals (Vn) as the automaton's alphabet, terminals (Vt) as the states, and the start symbol (S) as the automaton's start state. The production rules (P) are built by iterating over the automaton's transition function, where each state transition (q, a) → p is translated into a grammar rule q → a p. If a transition leads to a final state, an additional rule q → a is added. Finally, it returns a Grammar2 object representing the constructed regular grammar.
 ```python
+def finiteAutomatonToGrammar(self):
+    Vn = self.alphabet
+    Vt = self.states
+    S = self.startState
+    P = {}
 
+    for key, values in self.transitions.items():
+      for value in values:
+        if key[0] not in P.keys():
+          P[key[0]] = [key[1] + value]
+        else:
+          P[key[0]].append(key[1] + value)
+        if value in self.finalStates:
+          P[key[0]].append(key[1]) 
+
+    return Grammar2(
+      Vn = Vn,
+      Vt = Vt,
+      S = S,
+      P = P,
+    )
 ```
 
 ### Determinism Identificator for FA
-
+The isDetermenistic method checks whether a finite automaton is deterministic (DFA). It iterates through all states and input symbols, verifying that each state-symbol pair has at most one transition. If states are represented as frozenset (for handling NFA to DFA conversions), it ensures each (state, symbol) pair maps to exactly one state; otherwise, if multiple transitions exist, the automaton is non-deterministic (NFA). Missing transitions are allowed, but encountering multiple transitions for the same state-symbol pair results in returning False. If all checks pass, the automaton is deterministic, returning True.
 ```python
-
-```
-
-### Visualize Graph
-
-```python
-
+def isDetermenistic(self):
+    for state in self.states:
+      for symbol in self.alphabet:
+        if isinstance(state, frozenset):
+          if (state, symbol) not in self.transitions:
+            continue  # Missing transitions are allowed
+          if len(self.transitions[(state, symbol)]) != 1:
+            return False
+        else:
+          if (state, symbol) not in self.transitions:
+            continue  # Missing transitions are allowed
+          if len(self.transitions[(state, symbol)]) > 1:
+            return False
+    return True
 ```
 
 
 ### Implementation showcase
-Firstly, the main of the project will convert the grammar rules into a DFA. The converted propertes will be printed. Moreover, the `is_deterministic` function will be called to make sure that it works correctly. All this data will be outputted to the screen, which can be seen in the first screenshot.
+The intial finite automation is converted in the grammar, after that the grammar is given a type by Chomski tipization. After that the finite automation is verified for being deterministic, then it is converted to dfa and verified again.
+![Output](image-2.png)
 
-Secondly, the program converts the DFA info NFA. Similar properties will be printed to the console. This time, program will make sure that NFA is not deterministic. 
-![Program Output](./images/image3.png)
-
-Below are the graphs of the FAs generated using the program. It can be tracked using the corresponding rules that the graphs are indeed correct. 
-![Graph 1](./images/image1.png)
-![Graph 2](./images/image2.png)
+Here are the results as the graphics 
+![Graphic 1](image-1.png)
+![Graphic 2](image.png)
 
 ## Conclusion
-
+This work successfully converts an NFA to a DFA by properly managing state transitions and ensuring correct handling of composite states. The improved approach eliminates issues with string iteration, correctly tracks new states, and maintains the list-based structure. The final DFA accurately represents the deterministic equivalent of the given NFA.
 
 ## References
 [Chomsky Hierarchy of Computation](https://www.geeksforgeeks.org/chomsky-hierarchy-in-theory-of-computation/)
