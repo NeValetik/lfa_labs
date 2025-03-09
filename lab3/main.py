@@ -59,4 +59,4 @@ for op, type_enum in logical_ops.items():
 
 tokeniser = Tokeniser(tokenMap)
 
-[print (i) for i in tokeniser.tokenize("begin if (+ 10 == 11); end ifElse/11 != print() sin cos")]
+[print (i) for i in tokeniser.tokenize("begin if (+ 10 == 11); ifElse/11 != print(anton) sin cos end")]
