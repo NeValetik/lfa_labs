@@ -1,106 +1,162 @@
-# Topic: Intro to formal languages. Regular grammars. Finite Automata.
+# Determinism in Finite Automata. Conversion from NDFA 2 DFA. Chomsky Hierarchy.
 
-### Course: Formal Languages & Finite Automata
-### Author: Vladimir Vitcovshcii
-
-----
-## Objectives:
-  1. Understand concept of Finite Automaton
-  2. Implement the Finite Automaton with custom set Grammar
-  3. Setup the repo for the future use 
-```
-  My variant was 32:
-  {
-    Variant 32:
-      Q = {q0,q1,q2},
-      ∑ = {a,b,c},
-      F = {q2},
-      δ(q0,a) = q0,
-      δ(q0,a) = q1,
-      δ(q1,c) = q0,
-      δ(q1,b) = q1,
-      δ(q1,a) = q2,
-      δ(q2,a) = q2.
-  }  
-```
 ## Theory
+### Type 0 Grammar
+Type-0 grammars include all formal grammar. Type 0 grammar languages are recognized by turing machine. These languages are also known as the Recursively Enumerable languages. 
 
-### Finite Automata
-Finite automata are abstract machines used to recognize patterns in input sequences, forming the basis for understanding regular languages in computer science. They consist of states, transitions, and input symbols, processing each symbol step-by-step. If the machine ends in an accepting state after processing the input, it is accepted; otherwise, it is rejected. Finite automata come in deterministic (DFA) and non-deterministic (NFA), both of which can recognize the same set of regular languages. They are widely used in text processing, compilers, and network protocols.
-
-### Finite Languages
-
-A finite language is a subset of strings over an alphabet that contains a limited number of elements. Unlike infinite languages (e.g., those defined by regular expressions or grammars that allow recursion), finite languages are strictly bounded in the number of words they can generate. These languages can always be recognized by a finite automaton since their state space is limited.
-
-For example, a finite language over the alphabet {a, b, c} might be:L = { "a", "ab", "abc", "bca" }
-
-Since the language contains a fixed number of elements, it can be easily modeled using a simple finite automaton with a defined set of accepting states corresponding to each word in the language.
-
-Finite languages are useful in applications like keyword recognition, predefined command sets, and pattern matching, where the number of valid strings is strictly known.
-
-## Implementation description
-I chose the python language to skip all the distracting implementations even though I am really upset
-that python does not have object spreadinig like javascript, I even, at some moment, imported a library that implements the js object(dict) spreading, but nevertheless it is what it is.
-
-The implementation itself goes after the given example the only difference between the given "assist" and my implementation is separation of the classes. The grammar class takes the elements to initialize the language grammar. After that the grammar elements are used in Finite automaton creation which than is able to validate the input if it belongs to the given grammar. The last, but least is the main, just initialization and invoke, nothing more nothing less.
-
-This is the structure of the Program:
-
-```python
-class Grammar:
-  ...
-  def toFiniteAutomata():
-    for nonTerm, res in self.P.items():
-      for sequence in res:
-      
-        statePos = next((i for i, c in enumerate(sequence) if c in states), -1) # should be also updated to more non-terminals
-        
-        
-        key = (
-          nonTerm, 
-          sequence[:statePos] if statePos != -1 else sequence
-        )
-
-        value = sequence[statePos] if statePos != -1 else ""
-
-        if key not in transitionFunction:
-          transitionFunction[key] = [value]
-        elif value not in transitionFunction[key]:  
-          transitionFunction[key].append(value)
-  ...
+Grammar Production in the form of   
+`α→β`  where 
 ```
-In the first loop the cycle goes through all the rules/conditions for non terminals and values they can transform into. Then the cycle loops through all values that the responses could take and are predefined. Then the position of the non-terminal state is found in sequences and returned the position of them and then the key is create as ("<non-terminal>", "<terminal>") and the value is ["<non-terminal>"...].
-
-The next significant part is the finite automaton itself and its validation:
-```python
-class FiniteAutomata:
-  ...
-  def stringValidation(self, inp):
-    # then we are looping through the given input character by character
-    for ch in inp:
-      # if the character doesn't match the alfabet we return false
-      if ch not in self.alphabet:
-        return False
-      
-      # if the character doesn't exist in the state transformations in the pair with state return false
-      if (stateTrack, ch) not in self.transitions:
-        return False
-      
-      # update the state transition
-      stateTrack = self.transitions[(stateTrack, ch)][0] # logic should be added for scalability
-    ...
-# Validates the given input
+α is ( V + T)* V ( V + T)*
+V : Variables
+T : Terminals. 
+β is ( V + T )*. 
 ```
-In the finite automata the loop goes through inputed string and then it is verified if the string belongs to the alphabet, after that if the string in pair with the current state is in the transformations dictionary and after that the state is updated until it finishes the final state or breaks a rule.
 
-The output:
+In type 0 there must be at least one variable on the Left side of production
 
-![alt text](image.png)
+### Type 1 Grammar
+Type-1 grammars generate context-sensitive languages. The language generated by the grammar is recognized by the Linear Bound Automata 
 
-## Conclusions
-In this work, I explored the fundamentals of formal languages, regular grammars, and finite automata. The main objective was to understand finite automata, implement a custom one based on a given grammar, and set up a structured repository for future use.
+In Type 1 should be of Type 0 and in the form of
+```
+α→β
+∣α∣≤∣β∣
+```
+That is the count of symbol in α is less than or equal to β
 
-The result was a functional finite automaton capable of validating strings according to the specified grammar. The structured approach ensures scalability and future modifications. This work provided valuable insights into automata theory and practical implementation, reinforcing the theoretical knowledge gained from lectures.
+### Type 2 Grammar
+Type-2 grammars generate context-free languages. The language generated by the grammar is recognized by a Pushdown automata. In Type 2, it should be Type 1 and the left-hand side of production can have only one variable and there is no restriction on β
+
+`∣α∣=1`
+
+### Type 3 Grammar
+Type-3 grammars generate regular languages. These languages are exactly all languages that can be accepted by a finite-state automaton. Type 3 is the most restricted form of grammar. 
+
+Type 3 should be in the given form only:
+
+```
+V --> VT / T          (left-regular grammar)
+(or)
+V --> TV /T          (right-regular grammar)
+```
+
+
+## Task
+1. Understand what an automaton is and what it can be used for.
+2. Continuing the work in the same repository and the same project, the following need to be added:
+
+    a. Provide a function in your grammar type/class that could classify the grammar based on Chomsky hierarchy.
+
+    b. For this you can use the variant from the previous lab.
+3. According to your variant number (by universal convention it is register ID), get the finite automaton definition and do the following tasks: 
+
+    a. Implement conversion of a finite automaton to a regular grammar.
+
+    b. Determine whether your FA is deterministic or non-deterministic.
+
+    c. Implement some functionality that would convert an NDFA to a DFA.
+
+    d. Represent the finite automaton graphically
+
+Below is the grammar that is to be developed for variant 15:
+```latex
+Q = {q0,q1,q2,q3},
+∑ = {a,b,c},
+F = {q3},
+δ(q0,a) = q0,
+δ(q1,b) = q2,
+δ(q0,a) = q1,
+δ(q2,a) = q2,
+δ(q2,b) = q3,
+δ(q2,c) = q0
+# }
+```
+
+## Implementation
+### Chomsky Hierarchy Classification
+The `classify_grammar` function in Grammar class begins with the assumption that the grammar in question could belong to any of the four types: Type 3, Type 2, Type 1, or Type 0. It then proceeds to examine each production rule, scrutinizing the left-hand and right-hand sides with precision.The first clue it seeks is the length of the left-hand side. If it exceeds a single symbol, the function immediately dismisses the possibility of the grammar being Type 3 or Type 2. A critical observation, for such a structure would violate the very definition of those types. Next, it inspects the right-hand side for any signs of contraction. Specifically, whether it is shorter than the left-hand side. If so, the grammar cannot be Type 1, as context-sensitive grammars forbid such reductions. But the function does not stop there. It delves deeper, examining the arrangement of terminal and non-terminal symbols. It checks whether the right-hand side begins or ends with a non-terminal, and whether it contains more than one non-terminal. These patterns are the fingerprints of the grammar’s type. If the rules align with the strictures of Type 3, where non-terminals are confined to the beginning or end, and only one may appear: the function concludes that the grammar is regular. If not, it continues its investigation, ruling out possibilities one by one until the truth is laid bare. By the end of its analysis, the function arrives at a definitive conclusion. It declares the grammar to be Type 3 (regular), Type 2 (context-free), Type 1 (context-sensitive), or Type 0 (unrestricted).
+
+### FA To Grammar
+The `to_grammar` function in FiniteAutomaton class is a systematic process, akin to translating the language of finite automata into the structured rules of a formal grammar. It begins by establishing the foundational elements: the non-terminal symbols are derived from the states of the automaton, and the terminal symbols are drawn from its alphabet. These form the building blocks of the grammar, much like the raw materials of a well-constructed argument. Next, the function constructs the production rules, which are the heart of the grammar. It iterates through each state, treating it as a non-terminal symbol, and examines the transitions associated with that state. For every symbol in the alphabet, it checks if a transition exists from the current state to another state. If such a transition is found, it generates a production rule that maps the current state to a combination of the input symbol and the resulting state. This is the automaton’s logic being transcribed into grammatical form—a direct translation of "if in state X and reading symbol Y, move to state Z.". The function also accounts for final states, ensuring that the grammar captures the acceptance conditions of the automaton. If a transition leads to a final state, an additional production rule is created, allowing the grammar to terminate with the input symbol alone. This subtle but crucial detail ensures that the grammar correctly mirrors the automaton’s behavior when reaching an accepting state.  Finally, the function assembles these components—non-terminals, terminals, and production rules—into a Grammar object, complete with the initial state and final states of the automaton. The result is a precise and unambiguous representation of the automaton’s structure and logic in the form of a formal grammar.
+```python
+def to_grammar(self):
+  non_terminals = self.states
+  terminals = self.alphabet
+  productions = {}
+
+  for state in self.states:
+      productions[state] = []
+      for symbol in self.alphabet:
+          if state in self.transitions and symbol in self.transitions[state]:
+              next_states = self.transitions[state][symbol]
+              for next_state in next_states:
+                  productions[state].append(symbol + next_state)
+                  if next_state in self.final_states:
+                      productions[state].append(symbol)
+
+  return Grammar(non_terminals, terminals, productions, self.initial_state, self.final_states)
+```
+
+### Determinism Identificator for FA
+This function determines whether or not a Finite Automaton is deterministic or not. What needs to be done is just to checks whether or not there are multiple next states possibilities from a certain state. If that is the case for at least one state, then the entire Finite Automaton should be called non-deterministic 
+```python
+def is_deterministic(self):
+  for state in self.states:
+      for symbol in self.alphabet:
+          # Check if there are transitions for the current state and symbol
+          if state in self.transitions and symbol in self.transitions[state]:
+              next_states = self.transitions[state][symbol]
+              # If there are multiple next states, it's non-deterministic
+              if len(next_states) > 1:
+                  return False
+          else:
+              # If no transition is defined for the symbol, it's non-deterministic
+              return False
+  return True
+```
+
+### Visualize Graph
+To visualize graphs, I used the `graphviz` python library, which is a convenient tool to quickly generate graphs. This function goes through all possible transitions and connects them accordingly. This function works for both DFAs and NFAs. 
+```python
+def visualize_fa(fa, title):
+    graph = Digraph(comment=title)
+    graph.attr(rankdir='LR')
+
+    # Add states
+    for state in fa.states:
+        if state in fa.final_states:
+            graph.node(state, shape='doublecircle') 
+        else:
+            graph.node(state, shape='circle') 
+
+    graph.node('start', shape='none', label='') 
+    graph.edge('start', fa.initial_state)
+
+    for from_state, transitions in fa.transitions.items():
+        for symbol, to_states in transitions.items():
+            if isinstance(to_states, str):
+                graph.edge(from_state, to_states, label=symbol)
+            else:
+                for to_state in to_states:
+                    graph.edge(from_state, to_state, label=symbol)
+
+    graph.render(f'{title}.gv', view=True)
+```
+
+
+### Implementation showcase
+Firstly, the main of the project will convert the grammar rules into a DFA. The converted propertes will be printed. Moreover, the `is_deterministic` function will be called to make sure that it works correctly. All this data will be outputted to the screen, which can be seen in the first screenshot.
+
+Secondly, the program converts the DFA info NFA. Similar properties will be printed to the console. This time, program will make sure that NFA is not deterministic. 
+![Program Output](./images/image3.png)
+
+Below are the graphs of the FAs generated using the program. It can be tracked using the corresponding rules that the graphs are indeed correct. 
+![Graph 1](./images/image1.png)
+![Graph 2](./images/image2.png)
+
+## Conclusion
+In this report, there were explored the concepts of determinism in finite automata, the conversion from non-deterministic finite automata (NDFA) to deterministic finite automata (DFA), and the classification of grammars according to the Chomsky hierarchy. There were implemented a series of functions to classify grammars, convert finite automata to regular grammars, determine the determinism of an automaton, and visualize finite automata using graph representations. The implementation showcased the ability to convert a given finite automaton into a regular grammar and vice versa, while also distinguishing between deterministic and non-deterministic automata. The visualization of these automata provided a clear and intuitive understanding of their structures and transitions. The classification function successfully identified the type of grammar based on the Chomsky hierarchy, demonstrating the practical application of theoretical concepts.
 
 ## References
-1. Lecture notes
+[Chomsky Hierarchy of Computation](https://www.geeksforgeeks.org/chomsky-hierarchy-in-theory-of-computation/)
