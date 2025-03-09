@@ -18,8 +18,8 @@ class FiniteAutomata2 (FiniteAutomata):
           P[key[0]] = [key[1] + value]
         else:
           P[key[0]].append(key[1] + value)
-        if key[0] in self.finalStates:
-          P[key[0]].append(key[1])
+        if value in self.finalStates:
+          P[key[0]].append(key[1]) 
 
     return Grammar2(
       Vn = Vn,
@@ -43,16 +43,15 @@ class FiniteAutomata2 (FiniteAutomata):
             return False
     return True
 
-  def NfaToDfa(self) -> FiniteAutomata:
+  def NfaToDfa(self):
     dfaStartState = self.startState
     dfaFinalStates  = [] 
-
     dfaStates = {}
     dfaTransitions = {}
 
     currentState = [self.startState]
     
-    queue = deque([dfaStartState])
+    queue = deque([dfaStartState])# using queue method rather than table method
 
     while queue:
         currentState = queue.popleft()
@@ -76,7 +75,7 @@ class FiniteAutomata2 (FiniteAutomata):
         if any(state in self.finalStates for state in dfaState):
             dfaFinalStates.add(dfaState)
 
-    return FiniteAutomata(
+    return FiniteAutomata2(
         states=set(dfaStates.keys()),
         alphabet=self.alphabet,
         transitions=dfaTransitions,

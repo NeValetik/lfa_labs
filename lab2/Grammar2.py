@@ -5,7 +5,7 @@ class Grammar2(gram1):
   def __init__(self, **args):
     super().__init__(**args)
 
-  def chomskyTipisation(self):
+  def chomskyTypization(self):
     isType1 = True 
     isType2 = True  
     isType3Left = True 
@@ -15,12 +15,12 @@ class Grammar2(gram1):
     for lhs, rules in self.P.items():
       for rule in rules:
         if rule == "": 
-          if lhs != self.startSymbol or hasEmptyProduction:
+          if lhs != self.S or hasEmptyProduction:
             isType1 = False 
           hasEmptyProduction = True
     
     for lhs, rules in self.P.items():
-      if len(lhs) != 1 or lhs not in self.vn:
+      if len(lhs) != 1 or lhs not in self.Vn:
         isType2 = isType3Right = isType3Left = False
         
       for rule in rules:
@@ -28,13 +28,13 @@ class Grammar2(gram1):
           isType3Right = isType3Left = False
           continue
       
-        if any(c in self.vn for c in rule[:-1]):
+        if any(c in self.Vn for c in rule[:-1]):
           isType3Right = False
 
-        if len(rule) > 1 and (rule[0] not in self.vn or any(c in self.vn for c in rule[1:])):
+        if len(rule) > 1 and (rule[0] not in self.Vn or any(c in self.Vn for c in rule[1:])):
           isType3Left = False
     
-        if len(rule) < len(lhs) and not (lhs == self.startSymbol and rule == ""):
+        if len(rule) < len(lhs) and not (lhs == self.S and rule == ""):
           isType1 = False
 
     if isType3Right or isType3Left:

@@ -11,7 +11,8 @@ class TokenType(Enum):
   DEFINITION = 8
   BUILT_IN_FUNCTIONS = 9
   VALUE = 10
-  UNKNOWN = 11
+  BRACKETS = 11
+  UNKNOWN = 12
 
 class BuiltInFunction(Enum):
   PRINT = 1

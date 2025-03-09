@@ -1,3 +1,4 @@
+#Vitcovschii Vladimir FAF-231
 # Variant 32
 # Q = {q0,q1,q2},
 # ∑ = {a,b,c},
@@ -31,7 +32,14 @@ fa = FiniteAutomata2(
   finalStates = finalStates
 )
 
-print(fa.finiteAutomatonToGrammar())
+gramma = fa.finiteAutomatonToGrammar()
+print(gramma)
+print(gramma.chomskyTypization())
+
+print(fa.isDetermenistic())
+
+dfa = fa.NfaToDfa()
+print(dfa.isDetermenistic())
 
 
 
