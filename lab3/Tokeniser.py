@@ -7,9 +7,8 @@ class Tokeniser:
       self.tokenMap = tokenMap
 
   def tokenize(self, text: str):
-      # Use regex to split the input text based on tokens
       tokenlist = []
-      # Define regex patterns for matching tokens
+
       token_patterns = [
           (r'(!=|<=|>=|&&|==|\|\|)', TokenType.LOGICAL_OPERATION),  # Two-character logical operators
           (r'[\+\-\*/=]', TokenType.ARITHMETIC_OPERATION),       # Arithmetic operators
@@ -20,7 +19,6 @@ class Tokeniser:
           (r'[(){};]', TokenType.BRACKETS),                      # Brackets and semicolons
       ]
 
-      # Iterate over the text and apply each pattern
       i = 0
       while i < len(text):
           matched = False

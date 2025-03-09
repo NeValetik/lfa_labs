@@ -1,0 +1,30 @@
+// DFA
+digraph {
+	rankdir=LR
+	DFA_q0_q1_q2 [shape=doublecircle]
+	DFA_q0_q1 [shape=circle]
+	DFA_q0 [shape=circle]
+	DFA_q1 [shape=circle]
+	DFA_EMPTY [shape=circle]
+	DFA_q2 [shape=doublecircle]
+	start [label="" shape=none]
+	start -> DFA_q0
+	DFA_q0 -> DFA_EMPTY [label=c]
+	DFA_EMPTY -> DFA_EMPTY [label=c]
+	DFA_EMPTY -> DFA_EMPTY [label=b]
+	DFA_EMPTY -> DFA_EMPTY [label=a]
+	DFA_q0 -> DFA_EMPTY [label=b]
+	DFA_q0 -> DFA_q0_q1 [label=a]
+	DFA_q0_q1 -> DFA_q0 [label=c]
+	DFA_q0_q1 -> DFA_q1 [label=b]
+	DFA_q0_q1 -> DFA_q0_q1_q2 [label=a]
+	DFA_q1 -> DFA_q0 [label=c]
+	DFA_q1 -> DFA_q1 [label=b]
+	DFA_q1 -> DFA_q2 [label=a]
+	DFA_q0_q1_q2 -> DFA_q0 [label=c]
+	DFA_q0_q1_q2 -> DFA_q1 [label=b]
+	DFA_q0_q1_q2 -> DFA_q0_q1_q2 [label=a]
+	DFA_q2 -> DFA_EMPTY [label=c]
+	DFA_q2 -> DFA_EMPTY [label=b]
+	DFA_q2 -> DFA_q2 [label=a]
+}

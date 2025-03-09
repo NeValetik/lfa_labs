@@ -11,6 +11,31 @@
 # δ(q2,a) = q2.
 
 from lab2.FiniteAutomata2 import *
+from graphviz import Digraph
+
+def visualize_fa(fa: FiniteAutomata2, title):
+    graph = Digraph(comment=title)
+    graph.attr(rankdir='LR')
+
+    # Add states
+    for state in fa.states:
+        if state in fa.finalStates:
+            graph.node(state, shape='doublecircle')
+        else:
+            graph.node(state, shape='circle')
+
+    graph.node('start', shape='none', label='')
+    graph.edge('start', fa.startState)
+
+    for fromState, transitions in fa.transitions.items():
+        for toStates in transitions:
+            if isinstance(toStates, str):
+                graph.edge(fromState[0], toStates, label=fromState[1])
+            else:
+                for toState in toStates:
+                    graph.edge(fromState[0], toState, label=fromState[1])
+
+    graph.render(f'{title}.gv', view=True)
 
 states = { "q0", "q1", "q2" }
 alphabet = { "a", "b", "c" }
@@ -39,7 +64,9 @@ print(gramma.chomskyTypization())
 print(fa.isDetermenistic())
 
 dfa = fa.NfaToDfa()
-print(dfa.isDetermenistic())
+print(dfa.finiteAutomatonToGrammar())
 
+visualize_fa(dfa, 'DFA')
+print(dfa.isDetermenistic())
 
 
