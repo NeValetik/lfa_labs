@@ -59,14 +59,15 @@ fa = FiniteAutomata2(
 
 gramma = fa.finiteAutomatonToGrammar()
 print("The grammar from the given automation " + str(gramma))
-print(gramma.chomskyTypization())
-
+# print(gramma.chomskyTypization())
+print(fa)
 print("Is the current fa determenistic? " + str(fa.isDetermenistic()))
 
 dfa = fa.NfaToDfa()
-# print(dfa.finiteAutomatonToGrammar())
+print(dfa)
 print("Is the fa determenistic now? " + str(dfa.isDetermenistic()))
 
-visualize_fa(fa, 'DFA')
+visualize_fa(fa, 'NFA')
+visualize_fa(dfa, 'DFA')
 
 

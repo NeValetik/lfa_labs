@@ -167,3 +167,11 @@ class FiniteAutomata2 (FiniteAutomata):
       return "DFA_EMPTY"
     sortedStates = sorted(list(nextState))
     return "DFA_" + "_".join(str(state) for state in sortedStates)
+  
+  def __str__(self):
+    return  str(f"""
+States: {str(self.states)} 
+Transitions: {str(self.transitions)}  
+Start State: {str(self.startState)}
+Final States: {str(self.finalStates)}
+""")
