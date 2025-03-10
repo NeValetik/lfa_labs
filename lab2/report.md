@@ -212,14 +212,14 @@ def NfaToDfa(self):
         for state in currentStateSet:
           if (state, symbol) in self.transitions:
               # Get direct transitions
-            direct_states = self.transitions[(state, symbol)]
+            directStates = self.transitions[(state, symbol)]
             
             # For each direct state, add its epsilon closure
-            for direct_state in direct_states:
-              if direct_state in epsilonClosure:
-                nextStateSet.update(epsilonClosure[direct_state])
+            for directState in directStates:
+              if directState in epsilonClosure:
+                nextStateSet.update(epsilonClosure[directState])
               else:
-                nextStateSet.add(direct_state)
+                nextStateSet.add(directState)
         
           # Convert to string representation
           nextStateStr = self._stateSetToString(nextStateSet)
