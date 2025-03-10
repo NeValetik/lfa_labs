@@ -168,7 +168,7 @@ def isDetermenistic(self):
 ```
 
 ### Nfa to Dfa
-The isDetermenistic method checks whether a finite automaton is deterministic (DFA). It iterates through all states and input symbols, verifying that each state-symbol pair has at most one transition. If states are represented as frozenset (for handling NFA to DFA conversions), it ensures each (state, symbol) pair maps to exactly one state; otherwise, if multiple transitions exist, the automaton is non-deterministic (NFA). Missing transitions are allowed, but encountering multiple transitions for the same state-symbol pair results in returning False. If all checks pass, the automaton is deterministic, returning True.
+Convert an NFA to a DFA by first computing the epsilon closure of all NFA states and storing them in a dictionary. Initialize the DFA with the epsilon closure of the NFA's start state and use a queue to process new states. For each state, iterate through the input symbols (excluding epsilon), compute the next state set using transitions, and apply epsilon closures. Store transitions in a dictionary and track final states. If a state has no valid transitions, introduce a dead state looping on itself. Continue until all states are processed, then return the final DFA representation.
 
 ```python
 def NfaToDfa(self):
