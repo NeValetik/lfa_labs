@@ -1,5 +1,8 @@
 # Determinism in Finite Automata. Conversion from NDFA 2 DFA. Chomsky Hierarchy.
 
+### Course: Formal Languages & Finite Automata
+### Author: Vladimir Vitcovshcii
+
 ## Theory
 ### Type 0 Grammar
 Type-0 grammars include all formal grammar. Type 0 grammar languages are recognized by turing machine. These languages are also known as the Recursively Enumerable languages. 
@@ -164,6 +167,94 @@ def isDetermenistic(self):
     return True
 ```
 
+### Nfa to Dfa
+The isDetermenistic method checks whether a finite automaton is deterministic (DFA). It iterates through all states and input symbols, verifying that each state-symbol pair has at most one transition. If states are represented as frozenset (for handling NFA to DFA conversions), it ensures each (state, symbol) pair maps to exactly one state; otherwise, if multiple transitions exist, the automaton is non-deterministic (NFA). Missing transitions are allowed, but encountering multiple transitions for the same state-symbol pair results in returning False. If all checks pass, the automaton is deterministic, returning True.
+
+```python
+def NfaToDfa(self):
+    # Dictionary to store epsilon closures for each state
+    epsilonClosure = {}
+    for state in self.states:
+      epsilonClosure[state] = self.getEpsilonClosure(state)
+    
+    # First state of DFA will be epsilon closure of start state of NFA
+    startStateSet = epsilonClosure[self.startState]
+    startStateStr = self._stateSetToString(startStateSet)
+    
+    # Lists to track states to process and already processed states
+    dfaStack = [startStateSet]
+    dfaStates = [startStateSet]
+    dfaStatesStr = {startStateStr}
+    
+    # Create output components for DFA
+    dfaTransitions = {}
+    dfaFinalStates = set()
+    
+    # Check if start state is final
+    if any(state in self.finalStates for state in startStateSet):
+      dfaFinalStates.add(startStateStr)
+    
+    # Process all states in the stack
+    while dfaStack:
+      currentStateSet = dfaStack.pop(0)
+      currentStateStr = self._stateSetToString(currentStateSet)
+      
+      # Process each alphabet symbol (excluding epsilon if present)
+      for symbol in self.alphabet:
+        # Skip epsilon transitions in the main loop as they're handled via epsilon closure
+        if symbol == 'e':
+          continue
+            
+        # Compute the next state set for this symbol
+        nextStateSet = set()
+        
+        # For each state in current set, find transitions and apply epsilon closure
+        for state in currentStateSet:
+          if (state, symbol) in self.transitions:
+              # Get direct transitions
+            direct_states = self.transitions[(state, symbol)]
+            
+            # For each direct state, add its epsilon closure
+            for direct_state in direct_states:
+              if direct_state in epsilonClosure:
+                nextStateSet.update(epsilonClosure[direct_state])
+              else:
+                nextStateSet.add(direct_state)
+        
+          # Convert to string representation
+          nextStateStr = self._stateSetToString(nextStateSet)
+          
+          # Add transition
+          dfaTransitions[(currentStateStr, symbol)] = {nextStateStr}
+          
+          # If this is a new state, add it to be processed
+          if nextStateStr not in dfaStatesStr and nextStateSet:
+            dfaStack.append(nextStateSet)
+            dfaStates.append(nextStateSet)
+            dfaStatesStr.add(nextStateStr)
+              
+              # Check if it's a final state
+            if any(state in self.finalStates for state in nextStateSet):
+              dfaFinalStates.add(nextStateStr)
+          
+          # Handle empty set case (dead state)
+          if not nextStateSet:
+            deadState = self._stateSetToString(set())
+            dfaTransitions[(currentStateStr, symbol)] = {deadState}
+            
+            # Add dead state if not already present
+            if deadState not in dfaStatesStr:
+              dfaStatesStr.add(deadState)
+              
+              # Add transitions from dead state to itself for all symbols
+              for alpha in self.alphabet:
+                if alpha != 'e':  # Skip epsilon
+                  dfaTransitions[(deadState, alpha)] = {deadState}
+    
+    # Convert state sets to string representation for the final DFA
+    dfaStatesFinal = dfaStatesStr
+    return FiniteAutomata2    
+```
 
 ### Implementation showcase
 The intial finite automation is converted in the grammar, after that the grammar is given a type by Chomski tipization. After that the finite automation is verified for being deterministic, then it is converted to dfa and verified again. But something is odd with grammar.
