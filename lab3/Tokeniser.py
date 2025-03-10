@@ -10,13 +10,13 @@ class Tokeniser:
       tokenlist = []
 
       token_patterns = [
-          (r'(!=|<=|>=|&&|==|\|\|)', TokenType.LOGICAL_OPERATION),  # Two-character logical operators
-          (r'[\+\-\*/=]', TokenType.ARITHMETIC_OPERATION),       # Arithmetic operators
-          (r'[0-9]+\.[0-9]+', TokenType.VALUE),                  # Float values
-          (r'"[^"]*"', TokenType.VALUE),                         # String values
-          (r'[0-9]+', TokenType.VALUE),                          # Integer values
-          (r'[a-zA-Z_][a-zA-Z0-9_]*', TokenType.VARIABLE),       # Variables
-          (r'[(){};]', TokenType.BRACKETS),                      # Brackets and semicolons
+          (r'(!=|<=|>=|&&|==|\|\|)', TokenType.LOGICAL_OPERATION),  
+          (r'[\+\-\*/=]', TokenType.ARITHMETIC_OPERATION),       
+          (r'[0-9]+\.[0-9]+', TokenType.VALUE),                  
+          (r'"[^"]*"', TokenType.VALUE),                         
+          (r'[0-9]+', TokenType.VALUE),                          
+          (r'[a-zA-Z_][a-zA-Z0-9_]*', TokenType.VARIABLE),       
+          (r'[(){};]', TokenType.BRACKETS),                     
       ]
 
       i = 0

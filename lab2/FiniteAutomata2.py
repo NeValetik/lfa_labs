@@ -18,7 +18,7 @@ class FiniteAutomata2 (FiniteAutomata):
           P[key[0]] = [key[1] + value]
         else:
           P[key[0]].append(key[1] + value)
-        if value in self.finalStates:
+        if key[0] in self.finalStates:
           P[key[0]].append(key[1]) 
 
     return Grammar2(

@@ -166,7 +166,7 @@ def isDetermenistic(self):
 
 
 ### Implementation showcase
-The intial finite automation is converted in the grammar, after that the grammar is given a type by Chomski tipization. After that the finite automation is verified for being deterministic, then it is converted to dfa and verified again.
+The intial finite automation is converted in the grammar, after that the grammar is given a type by Chomski tipization. After that the finite automation is verified for being deterministic, then it is converted to dfa and verified again. But something is odd with grammar.
 ![Output](image-2.png)
 
 Here are the results as the graphics 
