@@ -7,39 +7,52 @@
 
 ## Theory
 
-A **Lexer**, or lexical analyzer, is the first stage in the compilation or interpretation process. Its primary role is to read the input source code and convert it into a sequence of **tokens**, which are structured representations of syntactic elements such as keywords, operators, variables, values, and punctuation.
+A **Lexer** (short for *lexical analyzer*) is a program or component responsible for breaking down a sequence of characters—usually source code—into a meaningful sequence of **tokens**. Tokens represent the smallest units of meaning, such as identifiers, literals, operators, delimiters, and keywords.
 
-This lexer implementation in Python uses `Enum` classes to define and categorize token types for clarity and modularity.
+Lexical analysis is the **first step** in most compiler or interpreter pipelines. It translates raw source code into a stream of tokens which are then consumed by a parser.
 
-### Token Types
+This lexer implementation is written in Python, with token classification and structure heavily reliant on Python's `Enum` classes. This design ensures a high degree of modularity and extensibility.
 
-Tokens are categorized using the following enums:
+### Why Enums?
 
-- **TokenType**: Main classification (e.g., `VALUE`, `VARIABLE`, `FUNCTION`)
-- **ArithmeticOperation**: Includes `PLUS`, `MINUS`, `ASSIGN`, etc.
-- **LogicalOperation**: Includes `AND`, `OR`, `EQUALS`, `MORE`, `LESS`, etc.
-- **BuiltInFunction**: Includes `PRINT`, `SIN`, `COS`
+The use of Python's `Enum` classes provides clarity, prevents errors due to typos, and makes the implementation easily expandable. Rather than comparing strings throughout the lexer, enums offer a well-defined set of expected categories.
 
-This design allows extensibility and simplifies the process of mapping raw tokens to their semantic categories.
+### Token Categories
+
+The lexer classifies tokens using several enums:
+
+- **TokenType**: Describes broad categories of tokens such as `VALUE`, `VARIABLE`, `BUILT_IN_FUNCTIONS`, etc.
+- **ArithmeticOperation**: Lists arithmetic operators like `+`, `-`, `*`, `/`, `=`.
+- **LogicalOperation**: Covers logical operations such as `==`, `!=`, `&&`, `||`, etc.
+- **BuiltInFunction**: Represents built-in functions that are reserved in the language like `print`, `sin`, `cos`.
+- **ValueType**: (Used internally) Differentiates between `INT`, `FLOAT`, and `STRING` values.
 
 ---
 
 ## Implementation Details
 
+The lexer operates in several clear stages:
+
 ### Token Class
 
-Each token is an object containing its value and type:
+The `Token` class encapsulates two main properties:
+
+- `value`: the actual string content of the token (e.g., "10", "print", "+")
+- `tokenType`: an instance of `TokenType`, providing a semantic label
 
 ```python
 class Token:
     def __init__(self, value, tokenType: TokenType):
         self.value = value
         self.tokenType = tokenType
+
+    def __str__(self):
+        return f"Token Value: {self.value} \t Token Type: {str(self.tokenType.name)}"
 ```
 
 ### Tokeniser Class
 
-The `Tokeniser` class is responsible for reading the input string and converting it into a list of tokens.
+The `Tokeniser` performs the core lexical analysis:
 
 ```python
 class Tokeniser:
@@ -47,34 +60,54 @@ class Tokeniser:
         self.tokenMap = tokenMap
 ```
 
-The `tokenize()` method uses regex to match logical and arithmetic operators, literals (integers, floats, strings), variables, brackets, and keywords.
+#### `tokenize(text: str)` method
 
-### Regex Patterns
+This method reads the input character by character and matches against regular expressions to identify known token types. The match order matters: complex tokens (like `!=`) are matched before simple ones (`=`).
 
-Token patterns include:
+The core loop:
 
-- Logical: `!=`, `<=`, `>=`, `&&`, `==`, `||`
-- Arithmetic: `+`, `-`, `*`, `/`, `=`
-- Values: integers (`[0-9]+`), floats (`[0-9]+\.[0-9]+`), strings (`"[^"]*"`)
-- Identifiers/variables: `[a-zA-Z_][a-zA-Z0-9_]*`
-- Brackets and punctuation: `(){}[];`
+- Skips whitespace
+- Checks regex patterns in order
+- Matches the longest valid token
+- Falls back to unknown classification if no pattern matches
+
+### Regex Matching Logic
+
+```python
+(r'(!=|<=|>=|&&|==|\|\|)', TokenType.LOGICAL_OPERATION),
+(r'[\+\-\*/=]', TokenType.ARITHMETIC_OPERATION),
+(r'[0-9]+\.[0-9]+', TokenType.VALUE),
+(r'"[^"]*"', TokenType.VALUE),
+(r'[0-9]+', TokenType.VALUE),
+(r'[a-zA-Z_][a-zA-Z0-9_]*', TokenType.VARIABLE),
+(r'[(){};]', TokenType.BRACKETS),
+```
+
+This pattern list allows accurate categorization and ordering of precedence for matching.
+
+### Special Handling
+
+If a `VARIABLE` matches a known keyword (e.g., `print`, `if`), it is upgraded to that specific `TokenType`. This is checked using `tokenMap`.
+
+If a character sequence cannot be matched by any known pattern, it is classified as `UNKNOWN` and processed accordingly.
 
 ---
 
 ## Error Handling
 
-Currently, unrecognized characters are silently skipped (`i += 1`). This is acceptable for an early prototype, but improvements may include:
+The lexer gracefully handles unexpected or malformed input:
 
-- Raising exceptions for invalid tokens
-- Providing warnings with line/column info
-- Logging tokenization issues for debugging
+- Characters or sequences not matching any pattern are assigned the type `UNKNOWN`
+- Multiple strategies for unknowns: checking non-alphanumeric symbols, prefix-based mismatches, or single characters
+- Prevents crashing and provides full token coverage of input
 
 ---
 
 ## Example Usage
 
 ```python
-tokens = tokeniser.tokenize("begin if (+ 10 == 11); ifElse/11 != print(anton) sin cos end")
+code = "begin if (+ 10 == 11); ifElse/11 != print(anton) sin cos end"
+tokens = tokeniser.tokenize(code)
 ```
 
 ### Token Types Output
@@ -112,18 +145,22 @@ end: END
 
 ## Conclusion
 
-This lexer implementation:
+This project demonstrates a clean and extensible implementation of a lexical analyzer in Python. It introduces the foundational concepts necessary for compiler or interpreter design.
 
-- Uses enums to classify and organize token types clearly.
-- Employs regex patterns for accurate token recognition.
-- Supports built-in functions, control flow keywords, variables, literals, and operators.
-- Prepares tokens for downstream processing like parsing or interpretation.
+### Highlights
+
+- Modular structure with clear class responsibilities
+- Enum usage for semantic clarity
+- Regex-based token matching
+- Supports keywords, built-in functions, operators, values, and brackets
+- Handles malformed input gracefully
 
 ### Potential Improvements
 
-- Add line/column tracking for better error messages.
-- Support context-sensitive analysis.
-- Integrate with a parser for full language interpretation.
+- Add line/column tracking for better error messages
+- Support for multiline string values and comments
+- Integration with a full parser or interpreter
+- Context-sensitive lexing (e.g., differentiate between `-` as negation vs subtraction)
 
-This project provides a foundational understanding of lexical analysis and the building blocks needed for compiler and interpreter development.
+This project offers a solid baseline for further language tool development, and introduces the student to the essential first phase of language processing: lexical analysis.
 
