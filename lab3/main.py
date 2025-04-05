@@ -1,9 +1,13 @@
 from TokenType import *
 from Tokeniser import *
 
+from TokenType import *
+from Tokeniser import *
+
 tokenMap = {
   "begin": TokenType.BEGIN,
   "end": TokenType.END,
+  "if": TokenType.IF,  # Added the 'if' keyword
   ";": TokenType.END_LINE,
   "(": TokenType.BRACKETS,
   ")": TokenType.BRACKETS,
@@ -58,5 +62,13 @@ for op, type_enum in logical_ops.items():
   tokenMap[op] = TokenType.LOGICAL_OPERATION
 
 tokeniser = Tokeniser(tokenMap)
+tokens = tokeniser.tokenize("begin if (+ 10 == 11); ifElse/11 != print(anton) sin cos end")
 
-[print (i) for i in tokeniser.tokenize("begin if (+ 10 == 11); ifElse/11 != print(anton) sin cos end")]
+# Print just the token types for comparison with expected output
+output = " ".join(token.tokenType.name for token in tokens)
+print(output)
+
+# For debugging, print each token with its value
+print("\nDetailed token list:")
+for token in tokens:
+    print(f"{token.value}: {token.tokenType.name}")

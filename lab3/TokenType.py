@@ -13,6 +13,7 @@ class TokenType(Enum):
   VALUE = 10
   BRACKETS = 11
   UNKNOWN = 12
+  IF=13
 
 class BuiltInFunction(Enum):
   PRINT = 1
