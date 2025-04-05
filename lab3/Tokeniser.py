@@ -34,7 +34,6 @@ class Tokeniser:
                   token_value = match.group(0)
                   
                   # For variables, check if the entire token matches a keyword
-                  # This prevents partial matches like seeing "if" in "ifElse"
                   if token_type == TokenType.VARIABLE and token_value in self.tokenMap:
                       token_type = self.tokenMap[token_value]
                   
@@ -48,7 +47,24 @@ class Tokeniser:
                   break
                   
           if not matched:
-              # If no match found, increment index by 1 to avoid infinite loop
-              i += 1
+              # If no pattern matched, let's try to identify unknown tokens
+              # First check for continuous sequences of non-alphanumeric, non-whitespace characters
+              unknown_match = re.match(r'[^\w\s]+', text[i:])
+              if unknown_match:
+                  token_value = unknown_match.group(0)
+                  tokenlist.append(Token(token_value, TokenType.UNKNOWN))
+                  i += len(token_value)
+              else:
+                  # If not a sequence of special characters, 
+                  # try to match alphanumeric preceded by non-alphanumeric (like $aaaasd)
+                  unknown_var_match = re.match(r'[^\w\s][a-zA-Z0-9_]+', text[i:])
+                  if unknown_var_match:
+                      token_value = unknown_var_match.group(0)
+                      tokenlist.append(Token(token_value, TokenType.UNKNOWN))
+                      i += len(token_value)
+                  else:
+                      # As a fallback, just take the single character
+                      tokenlist.append(Token(text[i], TokenType.UNKNOWN))
+                      i += 1
 
       return tokenlist

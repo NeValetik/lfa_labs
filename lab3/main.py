@@ -62,7 +62,7 @@ for op, type_enum in logical_ops.items():
   tokenMap[op] = TokenType.LOGICAL_OPERATION
 
 tokeniser = Tokeniser(tokenMap)
-tokens = tokeniser.tokenize("begin if (+ 10 == 11); ifElse/11 != print(anton) sin cos end")
+tokens = tokeniser.tokenize("begin if (+ 10 == 11); ifElse/11 != print(anton) sin cos end @#$")
 
 # Print just the token types for comparison with expected output
 output = " ".join(token.tokenType.name for token in tokens)
