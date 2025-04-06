@@ -65,8 +65,8 @@ class RegexMachine:
 
 patterns = [
     '(S|T)(U|V)W*Y+24', 
-    'L(M|N)D{3}P*Q(2|3)'
-    'R*S(T|U|V)W(X|Y|Z){2}'
+    'L(M|N)D{3}P*Q(2|3)',
+    'R*S(T|U|V)W(X|Y|Z){2}',
 ]
 machines = [ RegexMachine(pattern) for pattern in patterns ]
 [ machine.process() for machine in machines ]
