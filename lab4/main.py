@@ -1,19 +1,11 @@
 import itertools
 
 
-class SimpleRegexGenerator:
+class RegexMachine:
     def __init__(self, pattern):
         self.pattern = pattern
-        self.explanation = []  # To store explanation steps
-
-    def add_explanation(self, part, explanation):
-        """Adds an explanation for each part of the pattern being processed."""
-        self.explanation.append(f"Processing '{part}': {explanation}")
 
     def parse_pattern(self):
-        """
-        Parses the simplified pattern into components, with explanations.
-        """
         parts = []
         i = 0
         while i < len(self.pattern):
@@ -23,8 +15,6 @@ class SimpleRegexGenerator:
                     raise ValueError("Unmatched parenthesis")
                 group = self.pattern[i + 1:end].split('|')
                 parts.append(group)
-                self.add_explanation(self.pattern[i:end + 1],
-                                     "Either of " + " or ".join(group) + " appears exactly once")
                 i = end + 1
             elif self.pattern[i] == '{':
                 end = self.pattern.find('}', i)
@@ -34,49 +24,49 @@ class SimpleRegexGenerator:
                 if parts:
                     last_part = parts.pop()
                     parts.append([''.join([c] * repeat) for c in last_part])
-                self.add_explanation(self.pattern[i:end + 1], f"Previous character appears exactly {repeat} times")
                 i = end + 1
             elif i + 1 < len(self.pattern) and self.pattern[i + 1] in '?*+':
                 if self.pattern[i + 1] == '?':
                     parts.append([self.pattern[i], ''])
-                    self.add_explanation(self.pattern[i:i + 2], f"'{self.pattern[i]}' is optional")
                 elif self.pattern[i + 1] == '*':
-                    parts.append(['', self.pattern[i]])
-                    self.add_explanation(self.pattern[i:i + 2], f"'{self.pattern[i]}' appears zero or more times")
+                    parts.append([*[ self.pattern[i] * j for j in range(0,6) ]])
                 elif self.pattern[i + 1] == '+':
-                    parts.append([self.pattern[i], self.pattern[i] * 2])
-                    self.add_explanation(self.pattern[i:i + 2], f"'{self.pattern[i]}' appears one or more times")
+                    parts.append([*[ self.pattern[i] * j for j in range(1,6) ]])
                 i += 2
             else:
                 parts.append([self.pattern[i]])
-                self.add_explanation(self.pattern[i], f"'{self.pattern[i]}' appears exactly once")
                 i += 1
         return parts
 
-    def explain_process(self):
-        """Prints the explanation of how the pattern was processed."""
-        print(f"\nExplanation for Processing of Pattern {self.pattern}:")
-        for step in self.explanation:
-            print(step)
-        print("\n")
+    @staticmethod
+    def product(parts):
+        if not parts:
+            return []
 
-    def generate_strings(self, parts):
-        """
-        Generate strings from the parsed pattern components.
-        """
-        for combination in itertools.product(*parts):
+        result = ['']
+        for part in parts:
+            temp = []
+            for prefix in result:
+                for item in part:
+                    temp.append(prefix + item)
+            result = temp
+        return result
+
+    def generate_results(self, parts):
+        for combination in self.product(parts):
             yield ''.join(combination)
 
-    def run(self):
+    def process(self):
         parts = self.parse_pattern()
-        self.explain_process()
         print("Generated strings:")
-        for string in self.generate_strings(parts):
+        for string in self.generate_results(parts):
             print(string)
 
 
-pattern = 'M?N{2}(O|P){3}Q*R+'
-# pattern = '(X|Y|Z){3}8+(9|0)'
-# pattern = '(H|i)(J|K)L*N'
-generator = SimpleRegexGenerator(pattern)
-generator.run()
+patterns = [
+    '(S|T)(U|V)W*Y+24', 
+    'L(M|N)D{3}P*Q(2|3)'
+    'R*S(T|U|V)W(X|Y|Z){2}'
+]
+machines = [ RegexMachine(pattern) for pattern in patterns ]
+[ machine.process() for machine in machines ]
