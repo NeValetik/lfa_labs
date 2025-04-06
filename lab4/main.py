@@ -1,41 +1,74 @@
-import itertools
-
+#Variant 4 Vladimir Vitcovschii
 
 class RegexMachine:
+    MAX_REPEAT = 5  # Used for '*' and '+'
+
     def __init__(self, pattern):
         self.pattern = pattern
+
+    def find_matching(self, start, open_char, close_char):
+        depth = 0
+        for i in range(start, len(self.pattern)):
+            if self.pattern[i] == open_char:
+                depth += 1
+            elif self.pattern[i] == close_char:
+                depth -= 1
+                if depth == 0:
+                    return i
+        raise ValueError(f"Unmatched {open_char}")
 
     def parse_pattern(self):
         parts = []
         i = 0
+
         while i < len(self.pattern):
-            if self.pattern[i] == '(':
-                end = self.pattern.find(')', i)
-                if end == -1:
-                    raise ValueError("Unmatched parenthesis")
+            char = self.pattern[i]
+
+            # GROUP: (A|B)
+            if char == '(':
+                end = self.find_matching(i, '(', ')')
                 group = self.pattern[i + 1:end].split('|')
                 parts.append(group)
                 i = end + 1
-            elif self.pattern[i] == '{':
-                end = self.pattern.find('}', i)
-                if end == -1:
-                    raise ValueError("Unmatched curly brace")
+
+            # REPEAT: {3}
+            elif char == '{':
+                end = self.find_matching(i, '{', '}')
                 repeat = int(self.pattern[i + 1:end])
-                if parts:
-                    last_part = parts.pop()
-                    parts.append([''.join([c] * repeat) for c in last_part])
+                if not parts:
+                    raise ValueError("Nothing to repeat before '{...}'")
+                last = parts.pop()
+                parts.append([''.join([item * repeat]) for item in last])
                 i = end + 1
+
+            # QUANTIFIERS: ?, *, +
             elif i + 1 < len(self.pattern) and self.pattern[i + 1] in '?*+':
-                if self.pattern[i + 1] == '?':
-                    parts.append([self.pattern[i], ''])
-                elif self.pattern[i + 1] == '*':
-                    parts.append([*[ self.pattern[i] * j for j in range(0,6) ]])
-                elif self.pattern[i + 1] == '+':
-                    parts.append([*[ self.pattern[i] * j for j in range(1,6) ]])
+                symbol = self.pattern[i + 1]
+                base = self.pattern[i]
+
+                if symbol == '?':
+                    parts.append([base, ''])
+                elif symbol == '*':
+                    parts.append([base * j for j in range(0, self.MAX_REPEAT + 1)])
+                elif symbol == '+':
+                    parts.append([base * j for j in range(1, self.MAX_REPEAT + 1)])
+
                 i += 2
+
+            # MULTI-DIGIT LITERAL: '24'
+            elif char.isdigit():
+                start = i
+                while i < len(self.pattern) and self.pattern[i].isdigit():
+                    i += 1
+                parts.append([self.pattern[start:i]])
+
+            # DEFAULT: single character literal
             else:
-                parts.append([self.pattern[i]])
+                parts.append([char])
                 i += 1
+            #(X|Y|Z){2} is considered to be a double selection of the same object like xx yy zz and not their mix xy yx zy yz xz zx
+            #But will be implemented in the next hour
+
         return parts
 
     @staticmethod
@@ -57,11 +90,11 @@ class RegexMachine:
             yield ''.join(combination)
 
     def process(self):
+        print(f"Generated strings for pattern: {self.pattern}")
         parts = self.parse_pattern()
-        print("Generated strings:")
         for string in self.generate_results(parts):
             print(string)
-
+        print()
 
 patterns = [
     '(S|T)(U|V)W*Y+24', 
