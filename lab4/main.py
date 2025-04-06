@@ -31,14 +31,24 @@ class RegexMachine:
                 parts.append(group)
                 i = end + 1
 
-            # REPEAT: {3}
+            # REPEAT: {n}
             elif char == '{':
                 end = self.find_matching(i, '{', '}')
                 repeat = int(self.pattern[i + 1:end])
                 if not parts:
                     raise ValueError("Nothing to repeat before '{...}'")
                 last = parts.pop()
-                parts.append([''.join([item * repeat]) for item in last])
+
+                # If last is a group (e.g., ['X', 'Y', 'Z']), compute full Cartesian power
+                if len(last) > 1:
+                    repeated = [[]]
+                    for _ in range(repeat):
+                        repeated = [r + [c] for r in repeated for c in last]
+                    parts.append([''.join(r) for r in repeated])
+                else:
+                    # Just repeat the single element, like ['D'] -> ['DDD']
+                    parts.append([last[0] * repeat])
+
                 i = end + 1
 
             # QUANTIFIERS: ?, *, +
@@ -55,19 +65,17 @@ class RegexMachine:
 
                 i += 2
 
-            # MULTI-DIGIT LITERAL: '24'
+            # MULTI-DIGIT LITERAL: e.g. '24'
             elif char.isdigit():
                 start = i
                 while i < len(self.pattern) and self.pattern[i].isdigit():
                     i += 1
                 parts.append([self.pattern[start:i]])
 
-            # DEFAULT: single character literal
+            # DEFAULT: single character
             else:
                 parts.append([char])
                 i += 1
-            #(X|Y|Z){2} is considered to be a double selection of the same object like xx yy zz and not their mix xy yx zy yz xz zx
-            #But will be implemented in the next hour
 
         return parts
 
@@ -97,8 +105,8 @@ class RegexMachine:
         print()
 
 patterns = [
-    '(S|T)(U|V)W*Y+24', 
-    'L(M|N)D{3}P*Q(2|3)',
+    # '(S|T)(U|V)W*Y+24', 
+    # 'L(M|N)D{3}P*Q(2|3)',
     'R*S(T|U|V)W(X|Y|Z){2}',
 ]
 machines = [ RegexMachine(pattern) for pattern in patterns ]
