@@ -80,17 +80,17 @@ The implementation efficiently handles:
 - Complex combinations of these operators
 
 Images:
-    regex 1:
+regex 1:
 
-    ![First regex](./image2.png)
+![First regex](./image2.png)
     
-    regex 2:
+regex 2:
     
-    ![Second regex](./image3.png)
+![Second regex](./image3.png)
 
-    regex 3:
+regex 3:
     
-    ![Third regex](./image4.png)
+![Third regex](./image4.png)
 
 
 ## Conclusion
