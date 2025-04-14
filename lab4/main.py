@@ -98,15 +98,15 @@ class RegexMachine:
             yield ''.join(combination)
 
     def process(self):
-        print(f"Generated strings for pattern: {self.pattern}")
+        print(f"{self.pattern}")
         parts = self.parse_pattern()
         for string in self.generate_results(parts):
             print(string)
         print()
 
 patterns = [
-    # '(S|T)(U|V)W*Y+24', 
-    # 'L(M|N)D{3}P*Q(2|3)',
+    '(S|T)(U|V)W*Y+24', 
+    'L(M|N)D{3}P*Q(2|3)',
     'R*S(T|U|V)W(X|Y|Z){2}',
 ]
 machines = [ RegexMachine(pattern) for pattern in patterns ]

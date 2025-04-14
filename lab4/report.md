@@ -17,7 +17,7 @@ Regular expressions are a critical tool for programmers, data scientists, and sy
     c. **Bonus point**: write a function that will show sequence of processing regular expression (like, what you do first, second and so on)
 
 ## Variant 
-![My Variant](./image.png)
+![My Variant](./image1.png)
 
 ## Implementation Description
 The `RegexMachine` class represents a tool designed to generate valid combinations of symbols that conform to given regular expressions. This class efficiently handles complex regex patterns by breaking them down into components and generating all possible valid combinations.
@@ -78,6 +78,15 @@ The implementation efficiently handles:
 - Fixed repetition using curly braces {2}
 - Kleene star (*) for zero or more occurrences
 - Complex combinations of these operators
+
+Images:
+    regex 1:
+    ![First regex](./image2.png)
+    regex 2:
+    ![Second regex](./image3.png)
+    regex 3:
+    ![Third regex](./image4.png)
+
 
 ## Conclusion
 The `RegexMachine` implementation demonstrates a robust approach to regex pattern generation, effectively handling various regex operators and their combinations. The modular design with separate methods for matching, parsing, and generation makes the code maintainable and extensible. The implementation successfully meets the laboratory objectives by providing a practical tool for understanding and working with regular expressions, while also maintaining reasonable limits on pattern generation to prevent computational explosion.
