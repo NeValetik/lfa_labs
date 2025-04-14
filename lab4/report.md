@@ -81,10 +81,15 @@ The implementation efficiently handles:
 
 Images:
     regex 1:
+
     ![First regex](./image2.png)
+    
     regex 2:
+    
     ![Second regex](./image3.png)
+
     regex 3:
+    
     ![Third regex](./image4.png)
 
 
