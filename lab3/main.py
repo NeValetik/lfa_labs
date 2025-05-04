@@ -7,7 +7,7 @@ from Tokeniser import *
 tokenMap = {
   "begin": TokenType.BEGIN,
   "end": TokenType.END,
-  "if": TokenType.IF,  # Added the 'if' keyword
+  "if": TokenType.IF, 
   ";": TokenType.END_LINE,
   "(": TokenType.BRACKETS,
   ")": TokenType.BRACKETS,
