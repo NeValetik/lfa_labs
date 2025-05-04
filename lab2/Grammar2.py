@@ -44,7 +44,6 @@ class Grammar2(gram1):
     if isType1:
       return "Type 1: Context-Sensitive Grammar"
     return "Type 0: Unrestricted Grammar"
-  
 
   def __str__(self):
     return str(self.P)
