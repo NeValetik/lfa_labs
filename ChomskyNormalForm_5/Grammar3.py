@@ -122,7 +122,7 @@ class Grammar3(Grammar2):
         self.P = updatedRules
 
     def _createNewNonTerminal(self):
-        alphabet = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZαβγδζηθικλμνξοπρστυφχψω'
+        alphabet = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
         for letter in alphabet:
             if letter not in self.Vn:
@@ -130,7 +130,7 @@ class Grammar3(Grammar2):
                 return letter
 
         for letter in alphabet:
-            for num in range(100):
+            for num in range(50):
                 newSymbol = f'{letter}{num}'
                 if newSymbol not in self.Vn:
                     self.Vn.append(newSymbol)
@@ -212,4 +212,3 @@ class Grammar3(Grammar2):
         if printSteps:
             print('5. After converting to CNF:')
             print(self)
-            print()
