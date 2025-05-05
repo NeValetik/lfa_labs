@@ -203,7 +203,7 @@ def eliminateNonProductiveSymbols(self):
         self.P = updatedRules
 ```
 
-![Output 4](./images/output4.png)
+![Output 4](./image4.png)
 
 ### Converting to Chomsky Normal Form
 
