@@ -1,4 +1,4 @@
-import TokenType
+from lab3.TokenType import *
 
 class Token:
   def __init__(self, value, tokenType: TokenType):

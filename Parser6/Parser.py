@@ -1,5 +1,4 @@
-from TokenType import TokenType, enum
-
+from lab3.TokenType import TokenType
 
 class ASTNode:
     def __init__(self, type, children=None, value=None):
@@ -8,18 +7,37 @@ class ASTNode:
         self.children = children if children is not None else []
 
     def __repr__(self):
-        type_name = self.type.name if isinstance(self.type, enum.Enum) else self.type
+        type_name = self.type.name if isinstance(self.type, TokenType) else self.type
         return f"{type_name}({self.value}, {self.children})"
 
+'''
+class TokenType(Enum):
+  BEGIN = 1
+  END = 2
+  LOGICAL_OPERATION = 3
+  ARITHMETIC_OPERATION = 4
+  VARIABLE = 5
+  END_LINE = 6
+  FUNCTION = 7
+  DEFINITION = 8
+  BUILT_IN_FUNCTIONS = 9
+  VALUE = 10
+  BRACKETS = 11
+  UNKNOWN = 12
+  IF=13
+'''
 
 class Parser:
-    def __init__(self):
+    def __init__(self, rules):
         self.root = None
         self.current_node = None
+        self.rules = rules
         self.stack = []
 
     def parse(self, tokens):
-        self.root = ASTNode(TokenType.HTML_OPEN, value="ROOT")
+        print(tokens)
+
+        self.root = ASTNode(TokenType.BEGIN, value="ROOT")
         self.current_node = self.root
         self.stack = [self.root]
 

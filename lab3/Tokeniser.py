@@ -1,5 +1,5 @@
-from Token import *
-from TokenType import *
+from lab3.Token import *
+from lab3.TokenType import *
 import re
 
 class Tokeniser:

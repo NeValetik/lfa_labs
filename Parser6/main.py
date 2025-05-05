@@ -1,5 +1,6 @@
-from TokenType import *
-from Tokeniser import *
+from lab3.TokenType import *
+from lab3.Tokeniser import *
+from Parser6.Parser import *
 
 tokenMap = {
   "begin": TokenType.BEGIN,
@@ -65,7 +66,24 @@ tokens = tokeniser.tokenize("begin if (+ 10 == 11); ifElse/11 != print(anton) si
 output = " ".join(token.tokenType.name for token in tokens)
 print(output)
 
-# For debugging, print each token with its value
-print("\nDetailed token list:")
-for token in tokens:
-    print(f"{token.value}: {token.tokenType.name}")
+parserRules = {
+    TokenType.BEGIN: [TokenType.VARIABLE, TokenType.END]
+}
+
+parser = Parser()
+ast = parser.parse(tokens)
+print("AST: ")
+print(ast)
+
+# def visualize_ast(node, graph=None):
+#     if graph is None:
+#         graph = Digraph()
+#     graph.node(str(id(node)), label=f"{node.type.name}\n{node.value}")
+#     for child in node.children:
+#         graph.edge(str(id(node)), str(id(child)))
+#         visualize_ast(child, graph)
+#     return graph
+
+
+# graph = visualize_ast(ast)
+# graph.render('ast', view=True)
