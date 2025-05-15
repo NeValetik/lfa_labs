@@ -1,0 +1,41 @@
+digraph {
+	rankdir=TB
+	2726321401984 [label="TokenType.BEGIN
+program" fillcolor=lightblue shape=ellipse style=filled]
+	2726321401984 -> 2726321402560
+	2726321402560 [label=IF
+ fillcolor=lightblue shape=ellipse style=filled]
+	2726321402560 -> 2726321402224
+	2726321402224 [label="TokenType.LOGICAL_OPERATION
+==" fillcolor=lightblue shape=ellipse style=filled]
+	2726321402224 -> 2726321402128
+	2726321402128 [label="TokenType.VARIABLE
+x" fillcolor=lightblue shape=ellipse style=filled]
+	2726321402224 -> 2726321402176
+	2726321402176 [label="TokenType.VALUE
+1" fillcolor=lightblue shape=ellipse style=filled]
+	2726321402560 -> 2726321402272
+	2726321402272 [label=BLOCK
+ fillcolor=lightblue shape=ellipse style=filled]
+	2726321402272 -> 2726321402368
+	2726321402368 [label="FUNC_CALL
+print" fillcolor=lightblue shape=ellipse style=filled]
+	2726321402368 -> 2726321402320
+	2726321402320 [label="TokenType.VALUE
+10" fillcolor=lightblue shape=ellipse style=filled]
+	2726321402272 -> 2726321402512
+	2726321402512 [label=ASSIGNMENT
+ fillcolor=lightblue shape=ellipse style=filled]
+	2726321402512 -> 2726321402464
+	2726321402464 [label="TokenType.VARIABLE
+y" fillcolor=lightblue shape=ellipse style=filled]
+	2726321402512 -> 2726321402416
+	2726321402416 [label="TokenType.VALUE
+5" fillcolor=lightblue shape=ellipse style=filled]
+	2726321401984 -> 2726321402656
+	2726321402656 [label="FUNC_CALL
+print" fillcolor=lightblue shape=ellipse style=filled]
+	2726321402656 -> 2726321402608
+	2726321402608 [label="TokenType.VALUE
+100" fillcolor=lightblue shape=ellipse style=filled]
+}

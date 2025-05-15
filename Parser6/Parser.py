@@ -28,106 +28,123 @@ class TokenType(Enum):
 '''
 
 class Parser:
-    def __init__(self, rules):
-        self.root = None
-        self.current_node = None
-        self.rules = rules
-        self.stack = []
+    def __init__(self):
+        self.tokens = []
+        self.pos = 0
 
     def parse(self, tokens):
-        print(tokens)
+        self.tokens = tokens
+        self.pos = 0
 
-        self.root = ASTNode(TokenType.BEGIN, value="ROOT")
-        self.current_node = self.root
-        self.stack = [self.root]
+        self.expect(TokenType.BEGIN)
+        program_node = ASTNode(TokenType.BEGIN, value="program")
 
-        for token_type, value in tokens:
-            self.handle_token(token_type, value)
+        while not self.check(TokenType.END):
+            stmt = self.parse_statement()
+            program_node.children.append(stmt)
 
-        return self.root
+        self.expect(TokenType.END)
+        return program_node
 
-    def handle_token(self, token_type, value):
-        if token_type == TokenType.HEAD_OPEN:
-            self.handle_head_open()
-        elif token_type == TokenType.TITLE_OPEN:
-            self.handle_title_open()
-        elif token_type == TokenType.BODY_OPEN:
-            self.handle_body_open()
-        elif token_type == TokenType.H1_OPEN:
-            self.handle_h1_open()
-        elif token_type == TokenType.P_OPEN:
-            self.handle_p_open()
-        elif token_type == TokenType.CONTENT:
-            self.handle_content(value)
-        elif token_type == TokenType.HEAD_CLOSE:
-            self.handle_head_close()
-        elif token_type == TokenType.TITLE_CLOSE:
-            self.handle_title_close()
-        elif token_type == TokenType.BODY_CLOSE:
-            self.handle_body_close()
-        elif token_type == TokenType.H1_CLOSE:
-            self.handle_h1_close()
-        elif token_type == TokenType.P_CLOSE:
-            self.handle_p_close()
-        elif token_type == TokenType.HTML_CLOSE:
-            self.handle_html_close()
-
-    def handle_head_open(self):
-        head_node = ASTNode(TokenType.HEAD_OPEN)
-        self.current_node.children.append(head_node)
-        self.stack.append(head_node)
-        self.current_node = head_node
-
-    def handle_title_open(self):
-        title_node = ASTNode(TokenType.TITLE_OPEN)
-        self.current_node.children.append(title_node)
-        self.stack.append(title_node)
-        self.current_node = title_node
-
-    def handle_body_open(self):
-        body_node = ASTNode(TokenType.BODY_OPEN)
-        self.current_node.children.append(body_node)
-        self.stack.append(body_node)
-        self.current_node = body_node
-
-    def handle_h1_open(self):
-        h1_node = ASTNode(TokenType.H1_OPEN)
-        self.current_node.children.append(h1_node)
-        self.stack.append(h1_node)
-        self.current_node = h1_node
-
-    def handle_p_open(self):
-        p_node = ASTNode(TokenType.P_OPEN)
-        self.current_node.children.append(p_node)
-        self.stack.append(p_node)
-        self.current_node = p_node
-
-    def handle_content(self, content_value):
-        self.current_node.children.append(ASTNode(TokenType.CONTENT, value=content_value))
-
-    def handle_head_close(self):
-        self.handle_close(TokenType.HEAD_OPEN)
-
-    def handle_title_close(self):
-        self.handle_close(TokenType.TITLE_OPEN)
-
-    def handle_body_close(self):
-        self.handle_close(TokenType.BODY_OPEN)
-
-    def handle_h1_close(self):
-        self.handle_close(TokenType.H1_OPEN)
-
-    def handle_p_close(self):
-        self.handle_close(TokenType.P_OPEN)
-
-    def handle_html_close(self):
-        self.handle_close(TokenType.HTML_OPEN)
-
-    def handle_close(self, expected_open_token):
-        if self.stack and self.stack[-1].type == expected_open_token:
-            self.stack.pop()
-            if self.stack:
-                self.current_node = self.stack[-1]
-
+    def parse_statement(self):
+        if self.check(TokenType.IF):
+            return self.parse_if()
+        elif self.check(TokenType.BUILT_IN_FUNCTIONS):
+            stmt = self.parse_function_call()
+        elif self.check(TokenType.VARIABLE):
+            stmt = self.parse_assignment()
         else:
-            print(f"Error: Mismatched {expected_open_token.name.lower()} close token.")
+            raise SyntaxError(f"Unexpected token: {self.peek()}")
+
+        self.expect(TokenType.END_LINE)
+        return stmt
+
+    def parse_if(self):
+        self.expect(TokenType.IF)
+        self.expect(TokenType.BRACKETS, "(")
+        condition = self.parse_expression()
+        self.expect(TokenType.BRACKETS, ")")
+
+        # Parse a block or a single statement
+        if self.check(TokenType.BRACKETS, "{"):
+            then_branch = self.parse_block()
+        else:
+            then_branch = self.parse_statement()
+
+        return ASTNode("IF", [condition, then_branch])
+
+    def parse_block(self):
+        self.expect(TokenType.BRACKETS, "{")
+        block_node = ASTNode("BLOCK")
+
+        while not self.check(TokenType.BRACKETS, "}"):
+            stmt = self.parse_statement()
+            block_node.children.append(stmt)
+
+        self.expect(TokenType.BRACKETS, "}")
+        return block_node
+
+    def parse_assignment(self):
+        var = self.expect(TokenType.VARIABLE)
+        self.expect(TokenType.ARITHMETIC_OPERATION, "=")
+        expr = self.parse_expression()
+        return ASTNode("ASSIGNMENT", [ASTNode(TokenType.VARIABLE, value=var.value), expr])
+
+    def parse_function_call(self):
+        func = self.expect(TokenType.BUILT_IN_FUNCTIONS)
+        self.expect(TokenType.BRACKETS, "(")
+        arg = self.parse_expression()
+        self.expect(TokenType.BRACKETS, ")")
+        return ASTNode("FUNC_CALL", [arg], value=func.value)
+
+    def parse_expression(self):
+        left = self.parse_term()
+        while self.check(TokenType.ARITHMETIC_OPERATION) or self.check(TokenType.LOGICAL_OPERATION):
+            op = self.advance()
+            right = self.parse_term()
+            left = ASTNode(op.tokenType, [left, right], value=op.value)
+        return left
+
+    def parse_term(self):
+        if self.check(TokenType.VALUE) or self.check(TokenType.VARIABLE):
+            return ASTNode(self.advance().tokenType, value=self.tokens[self.pos - 1].value)
+        elif self.check(TokenType.BUILT_IN_FUNCTIONS):
+            return self.parse_function_call()
+        elif self.match(TokenType.BRACKETS, "("):
+            expr = self.parse_expression()
+            self.expect(TokenType.BRACKETS, ")")
+            return expr
+        else:
+            raise SyntaxError(f"Unexpected term: {self.peek()}")
+
+    # Helpers
+    def check(self, token_type, value=None):
+        if self.pos >= len(self.tokens):
+            return False
+        token = self.tokens[self.pos]
+        if token.tokenType != token_type:
+            return False
+        if value is not None and token.value != value:
+            return False
+        return True
+
+    def match(self, token_type, value=None):
+        if self.check(token_type, value):
+            self.advance()
+            return True
+        return False
+
+    def expect(self, token_type, value=None):
+        if not self.check(token_type, value):
+            raise SyntaxError(f"Expected {token_type.name} {value}, got {self.peek()}")
+        return self.advance()
+
+    def advance(self):
+        token = self.tokens[self.pos]
+        self.pos += 1
+        return token
+
+    def peek(self):
+        if self.pos < len(self.tokens):
+            return self.tokens[self.pos]
+        return None
