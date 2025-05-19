@@ -1,97 +1,172 @@
-# Regular Expressions
+# Abstract Syntax Tree Parsing
 
-### Course: Formal Languages & Finite Automata
-### Author: Vladimir Vitcovschii
+### Course: Formal Languages & Finite Automata  
+### Author: Vladimir Vitocvschii  
 
-----
+----  
 
-## Theory
-Regular expressions (regex) are used in computing for pattern matching and text manipulation. They originated from formal language theory and enable identifying text strings that match specified patterns. Regex uses a set of characters to define these patterns, making it possible to perform complex search, validation, and text transformation operations efficiently.The syntax of regex includes literals, character classes, quantifiers, and position anchors to craft patterns for matching a wide range of strings. Despite their versatility, regex can be complex due to their concise syntax and variations across different programming environments. This complexity, however, is offset by their powerful capability to automate and streamline text processing tasks.
-Regular expressions are a critical tool for programmers, data scientists, and system administrators, enhancing text data interaction and analysis. Mastery of regex opens up vast possibilities for text manipulation, making it a valuable skill in computer science.
+## Theory  
+An abstract syntax tree (AST) is a data structure used in computer science to represent the structure of a program or code snippet. It is a tree representation of the abstract syntactic structure of text (often source code) written in a formal language. Each node of the tree denotes a construct occurring in the text.  
+The syntax is "abstract" in that it omits certain details (e.g., parentheses for grouping) and focuses on structural or content-related elements. ASTs are crucial in compilers, program analysis, and transformation systems, serving as an intermediate representation during compilation.  
 
-## Objectives:
-1. Write and cover what regular expressions are, what they are used for;
-2. Below you will find 3 complex regular expressions per each variant. Take a variant depending on your number in the list of students and do the following:
-    a. Write a code that will generate valid combinations of symbols conform given regular expressions (examples will be shown).
-    b. In case you have an example, where symbol may be written undefined number of times, take a limit of 5 times (to evade generation of extremely long combinations);
-    c. **Bonus point**: write a function that will show sequence of processing regular expression (like, what you do first, second and so on)
+## Objectives:  
+1. Get familiar with parsing, its concepts, and implementation.  
+2. Understand the role of ASTs in representing code structure.  
+3. Extend the 3rd lab work with the following:  
+   1. Define a `TokenType` enum to categorize tokens using regex.  
+   2. Implement AST data structures suitable for the parsed text.  
+   3. Develop a parser to extract syntactic information from input.  
 
-## Variant 
+---
+
+## Implementation Description  
+
+### `TokenType` Class  
+The `TokenType` enumeration defines token categories for a programming language, including control structures, operations, variables, and literals. Additional enums (`BuiltInFunction`, `ArithmeticOperation`, `LogicalOperation`) specify subtypes for functions and operations.  
+```python  
+from enum import Enum  
+
+class TokenType(Enum):  
+    BEGIN = 1  
+    END = 2  
+    LOGICAL_OPERATION = 3  
+    ARITHMETIC_OPERATION = 4  
+    VARIABLE = 5  
+    END_LINE = 6  
+    FUNCTION = 7  
+    DEFINITION = 8  
+    BUILT_IN_FUNCTIONS = 9  
+    VALUE = 10  
+    BRACKETS = 11  
+    UNKNOWN = 12  
+    IF = 13  
+
+class BuiltInFunction(Enum):  
+    PRINT = 1  
+    SIN = 2  
+    COS = 3  
+
+class ArithmeticOperation(Enum):  
+    ASSIGN = 1  
+    PLUS = 2  
+    MINUS = 3  
+    DIVISION = 4  
+    MULTIPLICATION = 5  
+
+class LogicalOperation(Enum):  
+    NOT = 1  
+    OR = 2  
+    AND = 3  
+    EQUALS = 4  
+    MORE = 5  
+    LESS = 6  
+    LESS_EQ = 7  
+    MORE_EQ = 8  
+    NOT_EQ = 9
+
+```      
+### Lexer (Tokeniser)
+The Tokeniser class tokenizes input text using regex patterns. It identifies keywords, variables, literals, brackets, and operations. A tokenMap maps reserved keywords (e.g., begin, if, print) and symbols to their respective TokenType.
+
+```python
+class Tokeniser:  
+    def __init__(self, tokenMap: dict[str, TokenType]):  
+        self.tokenMap = tokenMap  
+
+    def tokenize(self, text: str):  
+        tokens = []  
+        i = 0  
+        while i < len(text):  
+            if text[i].isspace():  
+                i += 1  
+                continue  
+            # Regex patterns for tokens (simplified for brevity)  
+            token_patterns = [  
+                (r'(!=|<=|>=|&&|==|\|\|)', TokenType.LOGICAL_OPERATION),  
+                (r'[\+\-\*/=]', TokenType.ARITHMETIC_OPERATION),  
+                (r'[0-9]+(\.[0-9]+)?', TokenType.VALUE),  
+                (r'"[^"]*"', TokenType.VALUE),  
+                (r'[a-zA-Z_][a-zA-Z0-9_]*', TokenType.VARIABLE),  
+                (r'[(){};]', TokenType.BRACKETS),  
+            ]  
+            # Matching logic...  
+        return tokens
+```          
+### Abstract Syntax Tree Node Class
+The ASTNode class represents nodes in the AST. Each node has a type (e.g., IF, ASSIGNMENT), a value (e.g., variable name, literal), and children nodes.
+
+```python
+class ASTNode:  
+    def __init__(self, type, children=None, value=None):  
+        self.type = type  
+        self.value = value  
+        self.children = children if children is not None else []  
+
+    def __repr__(self):  
+        type_name = self.type.name if isinstance(self.type, TokenType) else self.type  
+        return f"{type_name}({self.value}, {self.children})"  
+```
+
+## Parser Class
+The Parser class constructs the AST by processing tokens. It handles statements like if conditions, assignments, function calls, and expressions.
+
+```python
+class Parser:  
+    def __init__(self):  
+        self.tokens = []  
+        self.pos = 0  
+
+    def parse(self, tokens):  
+        self.tokens = tokens  
+        self.pos = 0  
+        self.expect(TokenType.BEGIN)  
+        program_node = ASTNode(TokenType.BEGIN, value="program")  
+
+        while not self.check(TokenType.END):  
+            stmt = self.parse_statement()  
+            program_node.children.append(stmt)  
+
+        self.expect(TokenType.END)  
+        return program_node  
+
+    def parse_statement(self):  
+        if self.check(TokenType.IF):  
+            return self.parse_if()  
+        elif self.check(TokenType.BUILT_IN_FUNCTIONS):  
+            stmt = self.parse_function_call()  
+        elif self.check(TokenType.VARIABLE):  
+            stmt = self.parse_assignment()  
+        # Additional parsing methods for expressions, blocks, etc.
+```   
+## Execution and Result
+Sample Input:
+
+```python
+tokens = tokeniser.tokenize("""  
+  begin  
+    if (x == 1) {  
+      print(10);  
+      y = 5;  
+    }  
+    print(100);  
+  end  
+""")
+```  
+## Generated AST:
+```
+BEGIN(program, [  
+    IF([  
+        LOGICAL_OPERATION(==, [VARIABLE(x), VALUE(1)]),  
+        BLOCK([  
+            FUNC_CALL(10, [VALUE(10)]),  
+            ASSIGNMENT([VARIABLE(y), VALUE(5)])  
+        ]),  
+    FUNC_CALL(100, [VALUE(100)])  
+])  
+```
+## Visualization:
 ![My Variant](./image1.png)
 
-## Implementation Description
-The `RegexMachine` class represents a tool designed to generate valid combinations of symbols that conform to given regular expressions. This class efficiently handles complex regex patterns by breaking them down into components and generating all possible valid combinations.
+## Conclusion:
 
-**Core Functionalities**
-1) **Pattern Matching**: The `find_matching` method handles the parsing of nested structures like parentheses and curly braces, ensuring proper matching of opening and closing characters:
-
-```python
-def find_matching(self, start, open_char, close_char):
-    depth = 0
-    for i in range(start, len(self.pattern)):
-        if self.pattern[i] == open_char:
-            depth += 1
-        elif self.pattern[i] == close_char:
-            depth -= 1
-            if depth == 0:
-                return i
-    raise ValueError(f"Unmatched {open_char}")
-```
-
-2) **Pattern Generation**: The `product` method efficiently generates all possible combinations from the parsed pattern components using a cartesian product approach:
-
-```python
-@staticmethod
-def product(parts):
-    if not parts:
-        return []
-
-    result = ['']
-    for part in parts:
-        temp = []
-        for prefix in result:
-            for item in part:
-                temp.append(prefix + item)
-        result = temp
-    return result
-```
-
-3) **Pattern Parsing**: The `parse_pattern` method breaks down the regex pattern into its fundamental components, handling:
-   - Groups with alternatives (A|B)
-   - Exact repetitions {n}
-   - Quantifiers (?, *, +)
-   - Multi-digit literals
-   - Single characters
-
-The implementation includes a MAX_REPEAT constant (set to 5) to limit the number of repetitions for * and + quantifiers, preventing the generation of extremely long combinations.
-
-## Results
-The program successfully generates valid string combinations for complex regex patterns. For example, given the pattern 'R*S(T|U|V)W(X|Y|Z){2}', it generates all possible combinations where:
-- R can appear 0 to 5 times (due to *)
-- S appears exactly once
-- Either T, U, or V appears once
-- W appears exactly once
-- Two characters from the set {X, Y, Z} appear at the end
-
-The implementation efficiently handles:
-- Alternation using parentheses (T|U|V)
-- Fixed repetition using curly braces {2}
-- Kleene star (*) for zero or more occurrences
-- Complex combinations of these operators
-
-Images:
-regex 1:
-
-![First regex](./image2.png)
-    
-regex 2:
-    
-![Second regex](./image3.png)
-
-regex 3:
-    
-![Third regex](./image4.png)
-
-
-## Conclusion
-The `RegexMachine` implementation demonstrates a robust approach to regex pattern generation, effectively handling various regex operators and their combinations. The modular design with separate methods for matching, parsing, and generation makes the code maintainable and extensible. The implementation successfully meets the laboratory objectives by providing a practical tool for understanding and working with regular expressions, while also maintaining reasonable limits on pattern generation to prevent computational explosion.
+This laboratory work demonstrated the construction of an AST for a custom programming language. The Tokeniser class leveraged regex to categorize tokens, while the Parser class methodically built the AST by handling control structures (if), assignments, function calls, and expressions. The AST effectively captured the hierarchical relationships between statements, validated by the sample input's output. This implementation underscores the importance of parsing techniques and ASTs in formal language processing, providing a foundation for further exploration in compiler design and program analysis.
